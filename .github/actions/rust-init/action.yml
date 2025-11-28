@@ -51,7 +51,7 @@ runs:
         cargo +${{steps.toolchain-nightly.outputs.name}} install cargo-docs-rs
     - name: packages
       shell: bash
-      if: ${{ inputs.ubuntu_packages != 'nothing' }}
+      if: ${{ inputs.ubuntu_packages !== 'nothing' }}
       run: |
         which apt-get
         if [ -x "$(which apt-get)" ] ; then

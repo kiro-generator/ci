@@ -24,8 +24,9 @@ on:
         required: false
 
 env:
-  MEMO: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} {{ github.job }}"
+  MEMO: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ${{ github.job }}"
   JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  RUST_LOG: "${{ inputs.rustlog || 'info' }}"
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -62,7 +63,6 @@ jobs:
         env:
           ASAN_OPTIONS: "detect_odr_violation=0:detect_leaks=0"
           RUSTFLAGS: "-Z sanitizer=address"
-          RUST_LOG: "${{ inputs.rustlog }}"
           RPC_URL: ${{ inputs.fireblocks && secrets.RPC_URL }}
           FIREBLOCKS_API_KEY: ${{ inputs.fireblocks && secrets.FIREBLOCKS_API_KEY }}
           FIREBLOCKS_SECRET: ${{ inputs.fireblocks && secrets.FIREBLOCKS_SECRET }}
