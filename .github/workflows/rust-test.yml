@@ -1,0 +1,86 @@
+permissions:
+  contents: read
+on:
+  workflow_call:
+    inputs:
+      ubuntu_packages:
+        type: string
+        required: false
+        default: ""
+      toolchains:
+        type: string
+        required: false
+        default: '["stable"]'
+      feature_matrix:
+        type: string
+        required: false
+        default: '["default"]'
+      extra_script_path:
+        type: string
+        default: ".github/ci-scripts/extra.sh"
+        required: false
+      runner:
+        type: string
+        required: true
+      fireblocks:
+        type: boolean
+        default: false
+        required: false
+      rustlog:
+        type: string
+        default: "info"
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+name: test
+jobs:
+  coverage:
+    runs-on: ${{ inputs.runner }}
+    name: coverage / ${{ matrix.features }}
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: ${{ fromJSON(inputs.toolchains) }}
+        features: ${{ fromJSON(inputs.feature_matrix) }}
+    steps:
+      - name: Init
+        uses: carteramesh/ci/.github/actions/rust-init@main
+        with:
+          ubuntu_packages: ${{ inputs.ubuntu_packages }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - name: cargo install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: fireblocks env
+        if: ${{ inputs.fireblocks }}
+        run: |
+          echo "RPC_URL=${{ secrets.RPC_URL }}" >> $GITHUB_ENV
+          echo "FIREBLOCKS_ENDPOINT=${{ vars.FIREBLOCKS_ENDPOINT }}" >> $GITHUB_ENV
+          echo "FIREBLOCKS_API_KEY=${{ secrets.FIREBLOCKS_API_KEY }}" >> $GITHUB_ENV
+          echo "FIREBLOCKS_SECRET=${{ secrets.FIREBLOCKS_SECRET }}" >> $GITHUB_ENV
+          echo "TEST_PRIVATE_KEY=${{ secrets.TEST_PRIVATE_KEY }}" >> $GITHUB_ENV
+      - name: cargo generate-lockfile
+        if: hashFiles('Cargo.lock') == ''
+        run: cargo generate-lockfile
+      - name: llvm-cov (${{ matrix.features }})
+        run: |
+          if [ "${{ matrix.features }}" == "default" ]; then
+            cargo llvm-cov --locked --lcov --output-path lcov-${{ matrix.features }}.info --no-fail-fast -- --no-capture
+          else
+            cargo llvm-cov --locked --features "${{ matrix.features }}" --lcov --output-path lcov-${{ matrix.features }}.info --no-fail-fast -- --no-capture
+          fi
+        env:
+          RUST_LOG: "${{ inputs.rustlog }}"
+      - name: Record Rust version
+        run: echo "RUST=$(rustc --version)" >> "$GITHUB_ENV"
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: lcov-${{ matrix.features }}.info
+          flags: ${{ matrix.features }}
+          env_vars: OS,RUST

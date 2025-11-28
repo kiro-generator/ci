@@ -12,7 +12,10 @@ inputs:
     description: "Components to install"
     default: "rustfmt,clippy"
     required: false
-
+  ubuntu_packages:
+    description: "Packages to install"
+    required: false
+    default: "nothing"
 runs:
   using: composite
   steps:
@@ -44,3 +47,13 @@ runs:
       shell: bash
       run: |
         cargo +${{steps.toolchain-nightly.outputs.name}} install cargo-docs-rs
+    - name: packages
+      shell: bash
+      if: ${{ inputs.ubuntu_packages != 'nothing' }}
+      run: |
+        which apt-get
+        if [ -x "$(which apt-get)" ] ; then
+          sudo apt-get install -y ${{ inputs.ubuntu_packages }}
+        else
+          echo "No apt-get found"
+        fi

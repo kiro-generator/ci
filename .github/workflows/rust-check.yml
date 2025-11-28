@@ -5,7 +5,11 @@ on:
       ubuntu_packages:
         type: string
         required: false
-        default: ""
+        default: "nothing"
+      toolchains:
+        type: string
+        required: false
+        default: '["stable","nightly"]'
       feature_matrix:
         type: string
         required: false
@@ -41,23 +45,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [stable, nightly]
+        toolchain: ${{ fromJSON(inputs.toolchains) }}
         features: ${{ fromJSON(inputs.feature_matrix) }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
-      - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
-        shell: bash
-        run: |
-          f=${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
-          cargo +${{ matrix.toolchain }} clippy --all-targets $f -- -D warnings
+        with:
+          ubuntu_packages: ${{ inputs.ubuntu_packages }}
       # - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
-      #   uses: giraffate/clippy-action@v1
-      #   with:
-      #     reporter: "github-pr-check"
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     tool_name: clippy-${{ matrix.features }}
-      #     clippy_flags: ${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
+      #   shell: bash
+      #   run: |
+      #     f=${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
+      #     cargo +${{ matrix.toolchain }} clippy --all-targets $f -- -D warnings
+      - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
+        uses: giraffate/clippy-action@v1
+        with:
+          reporter: "github-pr-check"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tool_name: clippy-${{ matrix.features }}
+          clippy_flags: ${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
   semver:
     runs-on: ${{ inputs.runner }}
     name: semver
