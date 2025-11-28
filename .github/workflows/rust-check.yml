@@ -24,7 +24,7 @@ jobs:
     name: nightly fmt
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: cargo fmt --check
         run: |
           cargo +nightly fmt --check --all
@@ -41,7 +41,7 @@ jobs:
         features: ${{ fromJSON(inputs.feature_matrix) }}
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
         uses: giraffate/clippy-action@v1
         with:
@@ -55,7 +55,7 @@ jobs:
     if: true
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: cargo-semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2
         # with:
@@ -68,7 +68,7 @@ jobs:
     name: ubuntu / stable / features
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: cargo install cargo-hack
         uses: taiki-e/install-action@cargo-hack
       # intentionally no target specifier; see https://github.com/jonhoo/rust-ci-conf/pull/4
@@ -81,7 +81,7 @@ jobs:
     name: doc
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: cargo docs-rs
         run: |
           cargo +nightly docs-rs
@@ -90,7 +90,7 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: Install cargo-sort
         run: cargo install --locked cargo-sort
       - name: Check `Cargo.toml` sort
@@ -105,7 +105,7 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: Init
-        uses: cartera-mesh/ci/.github/actions/rust-init@main
+        uses: carteramesh/ci/.github/actions/rust-init@main
       - name: Install `cargo-machete`
         run: cargo install cargo-machete
       - name: Check unused Cargo dependencies
