@@ -28,7 +28,7 @@ runs:
       id: toolchain-nightly
       uses: dtolnay/rust-toolchain@nightly
       with:
-        components: "rustfmt"
+        components: "rustfmt,clippy"
     - name: Install stable
       id: toolchain-stable
       uses: dtolnay/rust-toolchain@stable
