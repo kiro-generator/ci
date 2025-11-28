@@ -27,28 +27,49 @@ runs:
       uses: ubicloud/rust-cache@v2
       with:
         cache-on-failure: "true"
-    - name: Install nightyly
-      id: toolchain-nightly
-      uses: dtolnay/rust-toolchain@nightly
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
       with:
-        components: "rustfmt,clippy"
-    - name: Install stable
-      id: toolchain-stable
-      shell: bash
-      run: |
-        rustup toolchain install stable --component clippy --profile minimal --no-self-update
-        rustup default stable
-        echo "name=stable" >> $GITHUB_OUTPUT
+        toolchain: stable,nightly
+        components: rustfmt,clippy
+    # - name: Install nightyly
+    #   id: toolchain-nightly
+    #   uses: dtolnay/rust-toolchain@nightly
+    #   with:
+    #     components: "rustfmt,clippy"
+    # - name: Install stable
+    #   id: toolchain-stable
+    #   shell: bash
+    #   run: |
+    #     rustup toolchain install stable --component clippy --profile minimal --no-self-update
+    #     rustup default stable
+    #     echo "name=stable" >> $GITHUB_OUTPUT
     - name: Debug versions
       shell: bash
       run: |
-        cargo +${{steps.toolchain-stable.outputs.name}} --version
-        cargo +${{steps.toolchain-nightly.outputs.name}} --version
-    - name: Install docsrs
+        cargo +nightly --version
+        cargo +stable --version
+    - name: Install cargo-sort
+      uses: baptiste0928/cargo-install@v3
+      with:
+        crate: cargo-sort
+        locked: false
+    - name: Install cargo-machete
+      uses: baptiste0928/cargo-install@v3
+      with:
+        crate: cargo-machete
+        locked: false
+    - name: Install cargo-machete
+      uses: baptiste0928/cargo-install@v3
+      with:
+        crate: cargo-docs-rs
+        locked: false
+    - name: Install cargo utils
       if: ${{ inputs.docsrs == 'true' }}
       shell: bash
       run: |
-        cargo +${{steps.toolchain-nightly.outputs.name}} install cargo-docs-rs
+        echo cargo install cargo-docs-rs
+        echo cargo install cargo-machete
+        echo cargo install cargo-sort
     - name: packages
       shell: bash
       if: ${{ inputs.ubuntu_packages }}

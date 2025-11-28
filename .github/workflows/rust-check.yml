@@ -113,8 +113,6 @@ jobs:
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
-      - name: Install cargo-sort
-        run: cargo install --locked cargo-sort
       - name: Check `Cargo.toml` sort
         run: |
           if [ -f ./scripts/cargo-sort.sh ]; then
@@ -123,13 +121,16 @@ jobs:
             cargo sort -c -g
           fi
 
-  machete:
+  dependencies:
     runs-on: ${{ inputs.runner }}
-    name: check unused deps - machete
+    name: check unused deps
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
-      - name: Install `cargo-machete`
-        run: cargo install cargo-machete
+      - name: cargo-udeps
+        if: false
+        run: |
+          cargo +nightly install cargo-udeps
+          cargo +nightly udeps  --all-targets  --workspace
       - name: Check unused Cargo dependencies
         run: cargo machete
