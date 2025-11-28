@@ -56,7 +56,16 @@ jobs:
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
-          fireblocks: ${{ inputs.fireblocks || 'false' }}
+      - name: fireblocks
+        uses: carteramesh/fireblocks-config-action@v1
+        if: ${{ inputs.fireblocks }}
+        with:
+          fireblocks-secret: |
+            ${{ secrets.FIREBLOCKS_SECRET }}
+          fireblocks-api-key: ${{ secrets.FIREBLOCKS_API_KEY }}
+          fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
+          solana-rpc-url: ${{ secrets.RPC_URL }}
+          commitment: "finalized"
       - name: llvm-tools
         shell: bash
         run: |
