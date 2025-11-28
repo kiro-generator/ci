@@ -26,6 +26,10 @@ on:
         type: boolean
         default: false
         required: false
+      args:
+        type: string
+        default: ""
+        required: false
       rustlog:
         type: string
         default: "info"
@@ -64,9 +68,9 @@ jobs:
       - name: llvm-cov (${{ matrix.features }})
         run: |
           if [ "${{ matrix.features }}" == "default" ]; then
-            cargo llvm-cov --locked --lcov --output-path lcov-${{ matrix.features }}.info --no-fail-fast -- --no-capture
+            cargo llvm-cov --locked --lcov --output-path lcov-${{ matrix.features }}.info --no-fail-fast -- --no-capture ${{ inputs.args }}
           else
-            cargo llvm-cov --locked --features "${{ matrix.features }}" --lcov --output-path lcov-${{ matrix.features }}.info --no-fail-fast -- --no-capture
+            cargo llvm-cov --locked --features "${{ matrix.features }}" --lcov --output-path lcov-${{ matrix.features }}.info --no-fail-fast -- --no-capture ${{ inputs.args }}
           fi
         env:
           RUST_LOG: "${{ inputs.rustlog }}"

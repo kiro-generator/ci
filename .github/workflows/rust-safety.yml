@@ -22,6 +22,10 @@ on:
         type: boolean
         default: false
         required: false
+      args:
+        type: string
+        default: ""
+        required: false
 
 env:
   MEMO: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ${{ github.job }}"
@@ -59,7 +63,7 @@ jobs:
         name: Enable debug symbols
       - name: cargo test -Zsanitizer=address
         # only --lib --tests b/c of https://github.com/rust-lang/rust/issues/53945
-        run: cargo test --lib --tests --no-fail-fast --target x86_64-unknown-linux-gnu -- --no-capture
+        run: cargo test --lib --tests --no-fail-fast --target x86_64-unknown-linux-gnu -- --no-capture ${{ inputs.args }}
         env:
           ASAN_OPTIONS: "detect_odr_violation=0:detect_leaks=0"
           RUSTFLAGS: "-Z sanitizer=address"
@@ -74,7 +78,7 @@ jobs:
           TEST_PRIVATE_KEY: ${{ inputs.fireblocks && secrets.TEST_PRIVATE_KEY }}
       - name: cargo test -Zsanitizer=leak
         if: always()
-        run: cargo test --target x86_64-unknown-linux-gnu
+        run: cargo test --target x86_64-unknown-linux-gnu  -- --no-capture ${{ inputs.args }}
         env:
           LSAN_OPTIONS: "suppressions=lsan-suppressions.txt"
           RUSTFLAGS: "-Z sanitizer=leak"
