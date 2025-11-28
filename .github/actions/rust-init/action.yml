@@ -48,28 +48,7 @@ runs:
       run: |
         cargo +nightly --version
         cargo +stable --version
-    - name: Install cargo-sort
-      uses: baptiste0928/cargo-install@v3
-      with:
-        crate: cargo-sort
-        locked: false
-    - name: Install cargo-machete
-      uses: baptiste0928/cargo-install@v3
-      with:
-        crate: cargo-machete
-        locked: false
-    - name: Install cargo-machete
-      uses: baptiste0928/cargo-install@v3
-      with:
-        crate: cargo-docs-rs
-        locked: false
-    - name: Install cargo utils
-      if: ${{ inputs.docsrs == 'true' }}
-      shell: bash
-      run: |
-        echo cargo install cargo-docs-rs
-        echo cargo install cargo-machete
-        echo cargo install cargo-sort
+
     - name: packages
       shell: bash
       if: ${{ inputs.ubuntu_packages }}

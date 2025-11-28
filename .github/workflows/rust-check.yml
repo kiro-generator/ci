@@ -52,11 +52,6 @@ jobs:
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
-      # - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
-      #   shell: bash
-      #   run: |
-      #     f=${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
-      #     cargo +${{ matrix.toolchain }} clippy --all-targets $f -- -D warnings
       - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
         uses: giraffate/clippy-action@v1
         with:
@@ -88,8 +83,11 @@ jobs:
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
-      - name: cargo install cargo-hack
-        uses: taiki-e/install-action@cargo-hack
+      - name: Install cargo-hack
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-hack
+          locked: false
       # intentionally no target specifier; see https://github.com/jonhoo/rust-ci-conf/pull/4
       # --feature-powerset runs for every combination of features
       - name: cargo hack
@@ -103,16 +101,26 @@ jobs:
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
+      - name: Install cargo-docs-rs
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-docs-rs
+          locked: false
       - name: cargo docs-rs
         run: |
           cargo +nightly docs-rs
 
-  cargo_sort:
+  cargo-sort:
     runs-on: ${{ inputs.runner }}
     name: cargo-sort
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
+      - name: Install cargo-sort
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-sort
+          locked: false
       - name: Check `Cargo.toml` sort
         run: |
           if [ -f ./scripts/cargo-sort.sh ]; then
@@ -127,6 +135,11 @@ jobs:
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
+      - name: Install cargo-machete
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-machete
+          locked: false
       - name: cargo-udeps
         if: false
         run: |

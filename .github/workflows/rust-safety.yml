@@ -45,7 +45,7 @@ jobs:
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
       - name: fireblocks
-        uses: carteramesh/fireblocks-config-action@v1
+        uses: carteramesh/fireblocks-config-action@main
         if: ${{ inputs.fireblocks }}
         with:
           fireblocks-secret: |
