@@ -1,6 +1,10 @@
 name: Rust Init
 description: Initialize a Rust project with a basic structure and dependencies.
 inputs:
+  fireblocks:
+    description: "setup fireblocks"
+    default: "true"
+    required: false
   git_token:
     description: "Token to authenticate for git"
     required: false
@@ -81,3 +85,13 @@ runs:
         else
           echo "No apt-get found"
         fi
+    - name: fireblocks
+      uses: CarteraMesh/fireblocks-config-action@v1
+      if: ${{ inputs.fireblocks == 'true' }}
+      with:
+        fireblocks-secret: |
+          ${{ secrets.FIREBLOCKS_SECRET }}
+        fireblocks-api-key: ${{ secrets.FIREBLOCKS_API_KEY }}
+        fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
+        solana-rpc-url: ${{ secrets.RPC_URL }}
+        commitment: "finalized"

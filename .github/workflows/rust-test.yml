@@ -56,6 +56,7 @@ jobs:
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
+          fireblocks: ${{ inputs.fireblocks || 'false' }}
       - name: llvm-tools
         shell: bash
         run: |
