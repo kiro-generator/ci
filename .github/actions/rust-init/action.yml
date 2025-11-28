@@ -34,9 +34,10 @@ runs:
         components: "rustfmt,clippy"
     - name: Install stable
       id: toolchain-stable
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        components: "clippy"
+      shell: bash
+      run: |
+        rustup toolchain install stable --component clippy --profile minimal --no-self-update
+        echo "name=stable" >> $GITHUB_OUTPUT
     - name: Debug versions
       shell: bash
       run: |

@@ -49,19 +49,12 @@ jobs:
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
           ubuntu_packages: ${{ inputs.ubuntu_packages }}
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: llvm-tools-preview
-      - name: cargo install cargo-llvm-cov
-        uses: taiki-e/install-action@cargo-llvm-cov
-      - name: fireblocks env
-        if: ${{ inputs.fireblocks }}
+      - name: llvm-tools
+        shell: bash
         run: |
-          echo "RPC_URL=${{ secrets.RPC_URL }}" >> $GITHUB_ENV
-          echo "FIREBLOCKS_ENDPOINT=${{ vars.FIREBLOCKS_ENDPOINT }}" >> $GITHUB_ENV
-          echo "FIREBLOCKS_API_KEY=${{ secrets.FIREBLOCKS_API_KEY }}" >> $GITHUB_ENV
-          echo "FIREBLOCKS_SECRET=${{ secrets.FIREBLOCKS_SECRET }}" >> $GITHUB_ENV
-          echo "TEST_PRIVATE_KEY=${{ secrets.TEST_PRIVATE_KEY }}" >> $GITHUB_ENV
+          rustup default ${{ matrix.toolchain }}
+          rustup component add llvm-tools-preview
+          cargo install cargo-llvm-cov
       - name: cargo generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
@@ -74,6 +67,15 @@ jobs:
           fi
         env:
           RUST_LOG: "${{ inputs.rustlog }}"
+          RPC_URL: ${{ inputs.fireblocks && secrets.RPC_URL }}
+          FIREBLOCKS_API_KEY: ${{ inputs.fireblocks && secrets.FIREBLOCKS_API_KEY }}
+          FIREBLOCKS_SECRET: ${{ inputs.fireblocks && secrets.FIREBLOCKS_SECRET }}
+          FIREBLOCKS_ENDPOINT: ${{ inputs.fireblocks && vars.FIREBLOCKS_ENDPOINT }}
+          FIREBLOCKS_POLL_TIMEOUT: "90"
+          FIREBLOCKS_POLL_INTERVAL: "5"
+          FIREBLOCKS_DEVNET: "true"
+          FIREBLOCKS_VAULT: "0"
+          TEST_PRIVATE_KEY: ${{ inputs.fireblocks && secrets.TEST_PRIVATE_KEY }}
       - name: Record Rust version
         run: echo "RUST=$(rustc --version)" >> "$GITHUB_ENV"
       - name: Upload to codecov.io
