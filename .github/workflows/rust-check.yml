@@ -152,4 +152,4 @@ jobs:
           cargo +nightly install cargo-udeps
           cargo +nightly udeps  --all-targets  --workspace
       - name: Check unused Cargo dependencies
-        run: cargo machete
+        run: cargo machete --with-metadata
