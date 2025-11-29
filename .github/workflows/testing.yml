@@ -19,6 +19,10 @@ jobs:
         shell: bash
         run: |
           echo config='{ "check": { "fmt": { "disabled": true} } }' >> $GITHUB_OUTPUT
+      - name: commands
+        shell: bash
+        run: |
+          (node --version ;  jq --version ; yq --version ) || echo oh no
   test:
     name: test
     needs: config
