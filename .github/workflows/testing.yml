@@ -29,4 +29,4 @@ jobs:
         run: |
           echo '${{ needs.config.outputs.config }}' | jq '.'
           echo fromJSON="${{ fromJSON(needs.config.outputs.config) }}" || echo "config failed"
-          echo fromJSON="${{ fromJSON(needs.config.outputs.config).check.fmt.disabled) }}" || echo "fmt disabled"
+          echo fromJSON="${{ fromJSON(needs.config.outputs.config).check.fmt.disabled }}" || echo "fmt disabled"
