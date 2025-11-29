@@ -30,5 +30,5 @@ jobs:
         shell: bash
         run: |
           echo '${{ needs.config.outputs.config }}' | jq '.'
-          echo fromJSON="{{ fromJSON(needs.config.outputs.config) }}" || echo "config failed"
+          echo fromJSON="${{ fromJSON(needs.config.outputs.config) }}" || echo "config failed"
           echo fromJSON="{{ fromJSON(needs.config.outputs.config.fmt.disabled) }}" || echo "fmt disabled"
