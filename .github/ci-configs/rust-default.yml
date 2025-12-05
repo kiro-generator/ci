@@ -24,7 +24,6 @@ jobs:
       os: []
       toolchains:
         - stable
-        - nightly
       features:
         - default
   fmt:
@@ -39,7 +38,6 @@ jobs:
       os: []
       toolchains:
         - stable
-        - nightly
       features:
         - default
 
