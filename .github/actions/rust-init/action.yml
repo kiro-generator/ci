@@ -2,20 +2,20 @@ name: Rust Init
 description: Initialize a Rust project with a basic structure and dependencies.
 inputs:
   git_token:
-    description: "Token to authenticate for git"
+    description: 'Token to authenticate for git'
     required: false
   docsrs:
-    description: "Install cargo-docs-rs"
-    default: "true"
+    description: 'Install cargo-docs-rs'
+    default: 'true'
     required: false
   components:
-    description: "Components to install"
-    default: "rustfmt,clippy"
+    description: 'Components to install'
+    default: 'rustfmt,clippy'
     required: false
   ubuntu_packages:
-    description: "Packages to install"
+    description: 'Packages to install'
     required: false
-    default: ""
+    default: ''
 runs:
   using: composite
   steps:
@@ -26,7 +26,7 @@ runs:
     - name: cache
       uses: ubicloud/rust-cache@v2
       with:
-        cache-on-failure: "true"
+        cache-on-failure: 'true'
     - uses: actions-rust-lang/setup-rust-toolchain@v1
       with:
         toolchain: stable,nightly

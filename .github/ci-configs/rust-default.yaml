@@ -1,0 +1,70 @@
+global:
+  ubuntu_packages: ''
+  toolchains:
+    - stable
+    - nightly
+  features:
+    - default
+  rustlog: info
+  fireblocks:
+    enabled: false
+jobs:
+  coverage:
+    if: true
+    continue-on-error: false
+    args: ''
+    run: |
+      cmd="cargo llvm-cov --locked --lcov --output-path lcov-${FEATURES}.info --no-fail-fast"
+      if [ "$FEATURES" == "default" ]; then
+        $cmd -- --no-capture $CARGO_ARGS
+      else
+        $cmd --features "$FEATURES" -- --no-capture $CARGO_ARGS
+      fi
+    matrix:
+      os: []
+      toolchains:
+        - stable
+        - nightly
+      features:
+        - default
+  fmt:
+    if: true
+    continue-on-error: false
+    run: cargo +nightly fmt --check --all
+  clippy:
+    if: true
+    continue-on-error: false
+    flags: ''
+    matrix:
+      os: []
+      toolchains:
+        - stable
+        - nightly
+      features:
+        - default
+
+  semver:
+    if: true
+    continue-on-error: false
+  hack:
+    if: true
+    continue-on-error: false
+    run: cargo hack --feature-powerset check
+  doc:
+    if: true
+    continue-on-error: false
+    run: cargo +nightly docs-rs
+
+  cargo-sort:
+    if: true
+    continue-on-error: false
+    run: |
+      if [ -f ./scripts/cargo-sort.sh ]; then
+        ./scripts/cargo-sort.sh
+      else
+        cargo sort -c -g
+      fi
+  dependencies:
+    if: true
+    continue-on-error: false
+    run: cargo machete --with-metadata

@@ -1,0 +1,80 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test-typescript:
+    name: TypeScript Tests
+    runs-on: ${{ vars.RUNNER }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: ubicloud/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install Dependencies
+        id: npm-ci
+        run: npm ci
+
+      - name: Check Format
+        id: npm-format-check
+        run: npm run format:check
+
+      - name: Lint
+        id: npm-lint
+        run: npm run lint
+
+      - name: Test
+        id: npm-ci-test
+        run: npm run ci-test
+
+  test-action:
+    name: GitHub Actions Test
+    runs-on: ${{ vars.RUNNER }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+      - name: Check if yq exists
+        id: check-yq
+        shell: bash
+        run: |
+          if command -v yq &> /dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup yq
+        if: steps.check-yq.outputs.exists == 'false'
+        uses: mikefarah/yq@v4
+
+      - name: Merge YAML configs
+        shell: bash
+        run: echo merge
+      - name: Test Local Action
+        id: test-action
+        uses: ./
+        with:
+          milliseconds: 2000
+
+      - name: Print Output
+        id: output
+        run: echo "${{ steps.test-action.outputs.time }}"

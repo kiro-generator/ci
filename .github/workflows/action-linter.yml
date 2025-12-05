@@ -1,0 +1,40 @@
+name: Lint Codebase
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  lint:
+    continue-on-error: true
+    name: Lint Codebase
+    runs-on: ${{ vars.RUNNER }}
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: ubicloud/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install Dependencies
+        id: install
+        run: npm ci
+
+      - name: Lint Codebase
+        id: super-linter
+        run: npm run format:check && npm run lint

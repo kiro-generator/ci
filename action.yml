@@ -1,0 +1,23 @@
+name: ci-config
+description: config ci config
+author: Cartera Mesh
+
+branding:
+  icon: scissors
+  color: black
+
+# Define your inputs here.
+inputs:
+  configs:
+    description: space separated list of configs to merge
+    required: false
+    default: ''
+
+# Define your outputs here.
+outputs:
+  config:
+    description: JSON string of the config
+
+runs:
+  using: node24
+  main: dist/index.js

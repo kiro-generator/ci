@@ -5,7 +5,7 @@ on:
       ubuntu_packages:
         type: string
         required: false
-        default: ""
+        default: ''
       toolchains:
         type: string
         required: false
@@ -16,7 +16,7 @@ on:
         default: '["default"]'
       extra_script_path:
         type: string
-        default: ".github/ci-scripts/extra.sh"
+        default: '.github/ci-scripts/extra.sh'
         required: false
       runner:
         type: string
@@ -24,7 +24,7 @@ on:
         required: false
       disable:
         type: string
-        default: ""
+        default: ''
         required: false
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -60,7 +60,7 @@ jobs:
       - name: ${{ matrix.toolchain }} cargo clippy (${{ matrix.features }})
         uses: giraffate/clippy-action@v1
         with:
-          reporter: "github-pr-check"
+          reporter: 'github-pr-check'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tool_name: clippy-${{ matrix.features }}
           clippy_flags: ${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}

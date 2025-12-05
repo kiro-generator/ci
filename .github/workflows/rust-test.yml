@@ -6,7 +6,7 @@ on:
       ubuntu_packages:
         type: string
         required: false
-        default: ""
+        default: ''
       toolchains:
         type: string
         required: false
@@ -17,7 +17,7 @@ on:
         default: '["default"]'
       extra_script_path:
         type: string
-        default: ".github/ci-scripts/extra.sh"
+        default: '.github/ci-scripts/extra.sh'
         required: false
       runner:
         type: string
@@ -28,15 +28,15 @@ on:
         required: false
       args:
         type: string
-        default: ""
+        default: ''
         required: false
       rustlog:
         type: string
-        default: "info"
+        default: 'info'
         required: false
 env:
-  MEMO: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ${{ github.job }}"
-  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  MEMO: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ${{ github.job }}'
+  JOB_URL: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
   RUST_LOG: "${{ inputs.rustlog || 'info' }}"
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -65,7 +65,7 @@ jobs:
           fireblocks-api-key: ${{ secrets.FIREBLOCKS_API_KEY }}
           fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
           solana-rpc-url: ${{ secrets.RPC_URL }}
-          commitment: "finalized"
+          commitment: 'finalized'
       - name: llvm-tools
         shell: bash
         run: |
