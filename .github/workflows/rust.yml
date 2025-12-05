@@ -19,36 +19,11 @@ jobs:
     outputs:
       config: ${{ steps.merge.outputs.config }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          token: ${{ github.token }}
-      - name: Check if yq exists
-        id: check-yq
-        shell: bash
-        run: |
-          if command -v yq &> /dev/null; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-      - name: Setup yq
-        if: steps.check-yq.outputs.exists == 'false'
-        uses: mikefarah/yq@v4
-      - name: Merge YAML configs
-        shell: bash
-        run: |
-          env | grep GITHUB | sort
-          yq eval-all '. as $item ireduce ({}; . * $item)' \
-            ${GITHUB_ACTION_PATH}/.github/ci-configs/rust-default.yml \
-            .github/ci-configs/*.yml \
-            -o json > merged.json
       - name: merge
         id: merge
-        uses: carteramesh/ci@main
+        uses: carteramesh/ci/.github/actions/rust-config@main
         with:
-          config: merged.json
-          runner: ${{ inputs.runner || vars.RUNNER }}
+          token: ${{ github.token }}
 
   coverage:
     runs-on: ${{ matrix.os }}
