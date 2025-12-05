@@ -1,72 +1,29 @@
-permissions:
-  contents: read
-on:
-  workflow_call:
-    inputs:
-      runner:
-        type: string
-        required: false
-
 env:
   MEMO: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ${{ github.job }}'
   JOB_URL: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+  RUST_LOG: "${{ fromJSON(inputs.config).global.rustlog || 'info' }}"
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 name: check test
 jobs:
-  config:
-    runs-on: ${{ inputs.runner || vars.RUNNER }}
-    name: generate config
-    outputs:
-      config: ${{ steps.merge.outputs.config }}
-    steps:
-      - name: Init
-        uses: carteramesh/ci/.github/actions/rust-init@main
-      - name: Check if yq exists
-        id: check-yq
-        shell: bash
-        run: |
-          if command -v yq &> /dev/null; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-      - name: Setup yq
-        if: steps.check-yq.outputs.exists == 'false'
-        uses: mikefarah/yq@v4
-      - name: Merge YAML configs
-        shell: bash
-        run: |
-          yq eval-all '. as $item ireduce ({}; . * $item)' \
-            ${{ github.action_path }}/.github/ci-configs/rust-default.yml \
-            .github/ci-configs/*.yml \
-            -o json > merged.json
-      - name: merge
-        id: merge
-        uses: carteramesh/ci@main
-        with:
-          config: merged.json
-          runner: ${{ inputs.runner || vars.RUNNER }}
-
   coverage:
     runs-on: ${{ matrix.os }}
-    needs: [config]
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.if }}
+    if: ${{ fromJSON(inputs.config).jobs.coverage.if }}
     name: coverage / ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchain }}
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.os }}
-        features: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.features }}
+        os: ${{ fromJSON(inputs.config).jobs.coverage.os }}
+        features: ${{ fromJSON(inputs.config).jobs.coverage.features }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          ubuntu_packages: ${{ fromJSON(inputs.config).global.ubuntu_packages }}
       - name: fireblocks
         uses: carteramesh/fireblocks-config-action@main
-        if: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.enabled }}
+        if: ${{ fromJSON(inputs.config).global.fireblocks.enabled }}
         with:
           fireblocks-secret: |
             ${{ secrets.FIREBLOCKS_SECRET }}
@@ -86,11 +43,10 @@ jobs:
         run: cargo generate-lockfile
       - name: llvm-cov (${{ matrix.features }})
         run: |
-          ${{ fromJSON(needs.config.outputs.config).jobs.coverage.run }}
+          ${{ fromJSON(inputs.config).jobs.coverage.run }}
         env:
           FEATURES: ${{ matrix.features }}
-          CARGO_ARGS: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.args || '' }}
-          RUST_LOG: "${{ fromJSON(needs.config.outputs.config).global.rustlog || 'info' }}"
+          CARGO_ARGS: ${{ fromJSON(inputs.config).jobs.coverage.args || '' }}
       - name: Record Rust version
         run: echo "RUST=$(rustc --version)" >> "$GITHUB_ENV"
       - name: Upload to codecov.io
@@ -102,32 +58,30 @@ jobs:
           flags: ${{ matrix.features }}
           env_vars: OS,RUST
   fmt:
-    needs: [config]
-    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    runs-on: ${{ fromJSON(inputs.config).runner }}
     name: fmt
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.fmt.if }}
+    if: ${{ fromJSON(inputs.config).jobs.fmt.if }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
       - name: fmt
         run: |
-          ${{ fromJSON(needs.config.outputs.config).jobs.fmt.run }}
+          ${{ fromJSON(inputs.config).jobs.fmt.run }}
   clippy:
-    needs: [config]
     runs-on: ${{ matrix.os }}
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.clippy.if }}
+    if: ${{ fromJSON(inputs.config).jobs.clippy.if }}
     name: ${{ matrix.toolchain }} / clippy / ${{ matrix.features }} / ${{ matrix.os }}
     permissions:
       contents: read
       checks: write
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.config.outputs.config).jobs.clippy.matrix }}
+      matrix: ${{ fromJSON(inputs.config).jobs.clippy.matrix }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config.global.ubuntu_packages) }}
+          ubuntu_packages: ${{ fromJSON(inputs.config.global.ubuntu_packages) }}
       - name: ${{ matrix.toolchains }} cargo clippy (${{ matrix.features }})
         uses: giraffate/clippy-action@v1
         with:
@@ -137,31 +91,30 @@ jobs:
           clippy_flags: ${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
 
   semver:
-    needs: [config]
-    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    runs-on: ${{ fromJSON(inputs.config).runner }}
     name: semver
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.semver.if }}
+    if: ${{ fromJSON(inputs.config).jobs.semver.if }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          ubuntu_packages: ${{ fromJSON(inputs.config).global.ubuntu_packages }}
       - name: cargo-semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2
         # with:
         # feature-group: ${{ matrix.features != 'default' && matrix.features || 'default-features' }}
+
   hack:
-    needs: [config]
     # cargo-hack checks combinations of feature flags to ensure that features are all additive
     # which is required for feature unification
-    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    runs-on: ${{ fromJSON(inputs.config).runner }}
     name: hack
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.hack.if }}
+    if: ${{ fromJSON(inputs.config).jobs.hack.if }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          ubuntu_packages: ${{ fromJSON(inputs.config).global.ubuntu_packages }}
       - name: Install cargo-hack
         uses: baptiste0928/cargo-install@v3
         with:
@@ -171,16 +124,16 @@ jobs:
       # --feature-powerset runs for every combination of features
       - name: cargo hack
         run: cargo hack --feature-powerset check
+
   doc:
-    needs: [config]
-    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    runs-on: ${{ fromJSON(inputs.config).runner }}
     name: doc
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.doc.if }}
+    if: ${{ fromJSON(inputs.config).jobs.doc.if }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          ubuntu_packages: ${{ fromJSON(inputs.config).global.ubuntu_packages }}
       - name: Install cargo-docs-rs
         uses: baptiste0928/cargo-install@v3
         with:
@@ -188,12 +141,12 @@ jobs:
           locked: false
       - name: cargo docs-rs
         run: |
-          ${{ fromJSON(needs.config.outputs.config).jobs.cargo-docs.run }}
+          ${{ fromJSON(inputs.config).jobs.cargo-docs.run }}
+
   cargo-sort:
-    needs: [config]
-    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    runs-on: ${{ fromJSON(inputs.config).runner }}
     name: cargo-sort
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.cargo-sort.if }}
+    if: ${{ fromJSON(inputs.config).jobs.cargo-sort.if }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
@@ -204,12 +157,12 @@ jobs:
           locked: false
       - name: Check `Cargo.toml` sort
         run: |
-          ${{ fromJSON(needs.config.outputs.config).jobs.cargo-sort.run }}
+          ${{ fromJSON(inputs.config).jobs.cargo-sort.run }}
+
   dependencies:
-    needs: [config]
-    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    runs-on: ${{ fromJSON(inputs.config).runner }}
     name: check unused deps
-    if: ${{ fromJSON(needs.config.outputs.config).jobs.dependencies.if }}
+    if: ${{ fromJSON(inputs.config).jobs.dependencies.if }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
@@ -220,4 +173,4 @@ jobs:
           locked: false
       - name: Check unused Cargo dependencies
         run: |
-          ${{ fromJSON(needs.config.outputs.config).jobs.dependencies.run }}
+          ${{ fromJSON(inputs.config).jobs.dependencies.run }}

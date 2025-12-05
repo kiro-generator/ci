@@ -4,14 +4,6 @@ inputs:
   git_token:
     description: 'Token to authenticate for git'
     required: false
-  docsrs:
-    description: 'Install cargo-docs-rs'
-    default: 'true'
-    required: false
-  components:
-    description: 'Components to install'
-    default: 'rustfmt,clippy'
-    required: false
   ubuntu_packages:
     description: 'Packages to install'
     required: false
