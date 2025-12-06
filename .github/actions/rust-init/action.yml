@@ -50,16 +50,15 @@ runs:
       shell: bash
       if: ${{ inputs.packages }}
       run: |
+        set -x
+        packages=""
         case $RUNNER_OS in
           Linux)
             packages=${{ fromJSON(inputs.packages).Linux }}
-            _os='linux'
             ;;
           macOS)
-            _os='darwin'
             packages=${{ fromJSON(inputs.packages).macOS }}
             ;;
-
           *)
             echo "Cannot handle OS of type $RUNNER_OS"
             echo "Expected one of: [ Linux macOS ]"
