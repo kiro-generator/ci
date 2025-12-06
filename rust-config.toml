@@ -1,2 +1,0 @@
-[check]
-fmt = { disabled = false, warn = false, toolchains = ["nightly"] }

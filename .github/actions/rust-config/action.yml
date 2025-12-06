@@ -34,9 +34,19 @@ runs:
     - name: Merge YAML configs
       shell: bash
       run: |
-        env | grep GITHUB | sort
+        # env | grep GITHUB | sort
+        BRANCH_ACTION_CONFIG=""
+        BRANCH_CONFIG=""
+        if [ -d  "${{ github.action_path }}/../../ci-configs/$GITHUB_REF_NAME" ]; then
+          BRANCH_ACTION_CONFIG="${{ github.action_path }}/../../ci-configs/$GITHUB_REF_NAME/*.yml"
+        fi
+        if [ -d "../../ci-configs/$GITHUB_REF_NAME" ]; then
+          BRANCH_CONFIG="../../ci-configs/$GITHUB_REF_NAME/*.yml"
+        fi
         yq eval-all '. as $item ireduce ({}; . * $item)' \
-          ${GITHUB_ACTION_PATH}/../../ci-configs/rust-default.yml \
+          "${{ github.action_path }}/../../ci-configs/rust-default.yml" \
+          $BRANCH_ACTION_CONFIG \
+          $BRANCH_CONFIG \
           .github/ci-configs/*.yml \
           -o json > merged.json
     - name: merge

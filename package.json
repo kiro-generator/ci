@@ -34,7 +34,8 @@
     "package": "npx rimraf ./dist && npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "package:watch": "npm run package -- --watch",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest",
-    "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
+    "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package",
+    "generate-schema": "tsx scripts/generate-schema.ts"
   },
   "license": "MIT",
   "dependencies": {
@@ -67,7 +68,8 @@
     "rollup": "^4.53.3",
     "ts-jest": "^29.4.6",
     "ts-jest-resolver": "^2.0.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod-to-json-schema": "^3.25.0"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "*"

@@ -30427,11 +30427,12 @@ const ConfigSchema = object({
     runner: string().optional(),
     global: object({
         ubuntu_packages: string().optional(),
-        toolchains: array(string()),
-        features: array(string()),
-        rustlog: string(),
+        toolchains: array(string()).default(['stable', 'nightly']),
+        features: array(string()).default(['default']),
+        rustlog: string().default('info'),
         fireblocks: object({
-            enabled: boolean(),
+            enabled: boolean().default(false),
+            'set-env-vars': boolean().default(true),
         }),
     }),
     jobs: object({
@@ -30441,9 +30442,9 @@ const ConfigSchema = object({
             args: string(),
             run: string(),
             matrix: object({
-                os: array(string()),
-                toolchains: array(string()),
-                features: array(string()),
+                os: array(string()).default([]),
+                toolchains: array(string()).default(['stable']),
+                features: array(string()).default(['default']),
             }),
         }),
         fmt: object({
@@ -30456,9 +30457,9 @@ const ConfigSchema = object({
             'continue-on-error': boolean(),
             flags: string(),
             matrix: object({
-                os: array(string()),
-                toolchains: array(string()),
-                features: array(string()),
+                os: array(string()).default([]),
+                toolchains: array(string()).default(['stable', 'nightly']),
+                features: array(string()).default(['default']),
             }),
         }),
         semver: object({
@@ -30485,74 +30486,30 @@ const ConfigSchema = object({
             'continue-on-error': boolean(),
             run: string(),
         }),
+        sanitizers: object({
+            enabled: boolean(),
+            matrix: object({
+                os: array(string()).default([]),
+                features: array(string()),
+            }),
+            address: object({
+                if: boolean(),
+                'continue-on-error': boolean(),
+                run: string(),
+            }),
+            leak: object({
+                if: boolean(),
+                'continue-on-error': boolean(),
+                run: string(),
+            }),
+            thread: object({
+                if: boolean(),
+                'continue-on-error': boolean(),
+                run: string(),
+            }),
+        }),
     }),
 });
-/*
-interface Config {
-  runner: string;
-  global: {
-    ubuntu_packages?: string;
-    toolchains: string[];
-    features: string[];
-    rustlog: string;
-    fireblocks: {
-      enabled: boolean;
-    };
-  };
-  jobs: {
-    coverage: {
-      if: boolean;
-      'continue-on-error': boolean;
-      args: string;
-      run: string;
-      matrix: {
-        os: string[];
-        toolchains: string[];
-        features: string[];
-      };
-    };
-    fmt: {
-      if: boolean;
-      'continue-on-error': boolean;
-      run: string;
-    };
-    clippy: {
-      if: boolean;
-      'continue-on-error': boolean;
-      flags: string;
-      matrix: {
-        os: string[];
-        toolchains: string[];
-        features: string[];
-      };
-    };
-    semver: {
-      if: boolean;
-      'continue-on-error': boolean;
-    };
-    hack: {
-      if: boolean;
-      'continue-on-error': boolean;
-      run: string;
-    };
-    doc: {
-      if: boolean;
-      'continue-on-error': boolean;
-      run: string;
-    };
-    'cargo-sort': {
-      if: boolean;
-      'continue-on-error': boolean;
-      run: string;
-    };
-    dependencies: {
-      if: boolean;
-      'continue-on-error': boolean;
-      run: string;
-    };
-  };
-}
-*/
 async function run() {
     try {
         const configFilePath = coreExports.getInput('config');
@@ -30565,24 +30522,25 @@ async function run() {
             configRaw = require$$1.readFileSync(configFilePath, 'utf8');
         }
         const finalConfig = ConfigSchema.parse(JSON.parse(configRaw));
-        finalConfig.runner = coreExports.getInput('runner') || 'ubuntu-latest';
-        if (!finalConfig.jobs.clippy.matrix.os) {
-            finalConfig.jobs.clippy.matrix.os = [];
+        finalConfig.runner = coreExports.getInput('runner');
+        if (!finalConfig.runner) {
+            coreExports.setFailed('runner is required');
         }
-        if (!finalConfig.jobs.coverage.matrix.os) {
-            finalConfig.jobs.coverage.matrix.os = [];
-        }
-        if (finalConfig.jobs.clippy.matrix.os.length === 0) {
-            finalConfig.jobs.clippy.matrix.os.push(finalConfig.runner);
-        }
-        if (finalConfig.jobs.coverage.matrix.os.length === 0) {
-            finalConfig.jobs.coverage.matrix.os.push(finalConfig.runner);
+        const jobsWithMatrix = Object.entries(finalConfig.jobs)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars
+            .filter(([_, job]) => 'matrix' in job && 'os' in job.matrix)
+            .map(([name]) => name);
+        for (const jobName of jobsWithMatrix) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const job = finalConfig.jobs[jobName];
+            if (job.matrix.os.length === 0) {
+                job.matrix.os.push(finalConfig.runner);
+            }
         }
         coreExports.setOutput('config', JSON.stringify(finalConfig));
     }
     catch (error) {
         // Fail the workflow run if an error occurs
-        //console.error(error);
         if (error instanceof Error)
             coreExports.setFailed(error.message);
     }

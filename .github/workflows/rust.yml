@@ -49,7 +49,7 @@ jobs:
           fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
           solana-rpc-url: ${{ secrets.RPC_URL }}
           commitment: 'finalized'
-          set-env-vars: 'false'
+          set-env-vars: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.set-env-vars }}
       - name: llvm-tools
         shell: bash
         run: |
@@ -196,3 +196,65 @@ jobs:
       - name: Check unused Cargo dependencies
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.dependencies.run }}
+  sanitizers:
+    if: ${{ fromJSON(needs.config.outputs.config).jobs.sanitizers.enabled }}
+    name: sanitizers / ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchains }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.sanitizers.matrix)) }}
+    runs-on: ${{ matrix.os }}
+    needs: [config, coverage]
+    steps:
+      - name: Init
+        uses: carteramesh/ci/.github/actions/rust-init@main
+        with:
+          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+      - name: fireblocks
+        uses: carteramesh/fireblocks-config-action@main
+        if: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.enabled }}
+        with:
+          fireblocks-secret: |
+            ${{ secrets.FIREBLOCKS_SECRET }}
+          fireblocks-api-key: ${{ secrets.FIREBLOCKS_API_KEY }}
+          fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
+          solana-rpc-url: ${{ secrets.RPC_URL }}
+          commitment: 'finalized'
+          set-env-vars: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.set-env-vars }}
+
+      - name: Enable debug symbols
+        run: |
+          rustup default nightly
+          # to get the symbolizer for debug symbol resolution
+          sudo apt install llvm
+          # to fix buggy leak analyzer:
+          # https://github.com/japaric/rust-san#unrealiable-leaksanitizer
+          # ensure there's a profile.dev section
+          if ! grep -qE '^[ \t]*[profile.dev]' Cargo.toml; then
+              echo >> Cargo.toml
+              echo '[profile.dev]' >> Cargo.toml
+          fi
+          # remove pre-existing opt-levels in profile.dev
+          sed -i '/^\s*\[profile.dev\]/,/^\s*\[/ {/^\s*opt-level/d}' Cargo.toml
+          # now set opt-level to 1
+          sed -i '/^\s*\[profile.dev\]/a opt-level = 1' Cargo.toml
+
+      - name: cargo test -Zsanitizer=address
+        if: ${{ fromJSON(needs.config.outputs.config).jobs.sanitizers.address.if }}
+        # only --lib --tests b/c of https://github.com/rust-lang/rust/issues/53945
+        run: |
+          cargo test --lib --tests --no-fail-fast --target x86_64-unknown-linux-gnu -- --no-capture
+        env:
+          ASAN_OPTIONS: 'detect_odr_violation=0:detect_leaks=0'
+          RUSTFLAGS: '-Z sanitizer=address'
+      - name: cargo test -Zsanitizer=leak
+        if: ${{ fromJSON(needs.config.outputs.config).jobs.sanitizers.leak.if }}
+        run: |
+          cargo test --target x86_64-unknown-linux-gnu  -- --no-capture
+        env:
+          LSAN_OPTIONS: 'suppressions=lsan-suppressions.txt'
+          RUSTFLAGS: '-Z sanitizer=leak'
+      - name: cargo test -Zsanitizer=thread
+        if: ${{ fromJSON(needs.config.outputs.config).jobs.sanitizers.thread.if }}
+        run: cargo test --target x86_64-unknown-linux-gnu -- --test-threads=1 --no-capture
+        env:
+          RUSTFLAGS: '-Z sanitizer=thread'

@@ -8,6 +8,7 @@ global:
   rustlog: info
   fireblocks:
     enabled: false
+    set-env-vars: true
 jobs:
   coverage:
     if: true
@@ -66,3 +67,22 @@ jobs:
     if: true
     continue-on-error: false
     run: cargo machete --with-metadata
+
+  sanitizers:
+    enabled: true
+    matrix:
+      os: []
+      features:
+        - default
+    address:
+      if: true
+      continue-on-error: false
+      run: cargo test --lib --tests --no-fail-fast --target x86_64-unknown-linux-gnu -- --no-capture
+    leak:
+      if: true
+      continue-on-error: false
+      run: cargo test --target x86_64-unknown-linux-gnu  -- --no-capture
+    thread:
+      if: true
+      continue-on-error: false
+      run: cargo test --target x86_64-unknown-linux-gnu -- --test-threads=1

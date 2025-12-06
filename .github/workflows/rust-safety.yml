@@ -73,33 +73,17 @@ jobs:
       - name: cargo test -Zsanitizer=address
         # only --lib --tests b/c of https://github.com/rust-lang/rust/issues/53945
         run: |
-          if [ "${{ inputs.fireblocks }}" == "true" ]; then
-            export RPC_URL="${{ secrets.RPC_URL }}"
-            export FIREBLOCKS_API_KEY="${{ secrets.FIREBLOCKS_API_KEY || '' }}"
-            export FIREBLOCKS_SECRET="${{ secrets.FIREBLOCKS_SECRET || '' }}"
-            export FIREBLOCKS_ENDPOINT="${{ vars.FIREBLOCKS_ENDPOINT || '' }}"
-            export FIREBLOCKS_POLL_TIMEOUT="90"
-            export FIREBLOCKS_POLL_INTERVAL="5"
-            export FIREBLOCKS_DEVNET="true"
-            export FIREBLOCKS_VAULT="${{ vars.FIREBLOCKS_VAULT || '' }}"
-          fi
-          cargo test --lib --tests --no-fail-fast --target x86_64-unknown-linux-gnu -- --no-capture ${{ inputs.args }}
+          cargo test --lib --tests --no-fail-fast --target x86_64-unknown-linux-gnu -- --no-capture
         env:
           ASAN_OPTIONS: 'detect_odr_violation=0:detect_leaks=0'
           RUSTFLAGS: '-Z sanitizer=address'
       - name: cargo test -Zsanitizer=leak
         run: |
-          if [ "${{ inputs.fireblocks }}" == "true" ]; then
-            export RPC_URL="${{ secrets.RPC_URL }}"
-            export FIREBLOCKS_API_KEY="${{ secrets.FIREBLOCKS_API_KEY || '' }}"
-            export FIREBLOCKS_SECRET="${{ secrets.FIREBLOCKS_SECRET || '' }}"
-            export FIREBLOCKS_ENDPOINT="${{ vars.FIREBLOCKS_ENDPOINT || '' }}"
-            export FIREBLOCKS_POLL_TIMEOUT="90"
-            export FIREBLOCKS_POLL_INTERVAL="5"
-            export FIREBLOCKS_DEVNET="true"
-            export FIREBLOCKS_VAULT="${{ vars.FIREBLOCKS_VAULT || '' }}"
-          fi
-          cargo test --target x86_64-unknown-linux-gnu  -- --no-capture ${{ inputs.args }}
+          cargo test --target x86_64-unknown-linux-gnu  -- --no-capture
         env:
           LSAN_OPTIONS: 'suppressions=lsan-suppressions.txt'
           RUSTFLAGS: '-Z sanitizer=leak'
+      - name: cargo test -Zsanitizer=thread
+        run: cargo test --target x86_64-unknown-linux-gnu -- --test-threads=1
+        env:
+          RUSTFLAGS: '-Z sanitizer=thread'
