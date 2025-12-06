@@ -1,7 +1,394 @@
 {
   "$ref": "#/definitions/RustCIConfig",
   "definitions": {
-    "RustCIConfig": {}
+    "RustCIConfig": {
+      "type": "object",
+      "properties": {
+        "runner": {
+          "type": "string"
+        },
+        "global": {
+          "type": "object",
+          "properties": {
+            "packages": {
+              "type": "object",
+              "properties": {
+                "Linux": {
+                  "type": "string"
+                },
+                "macOS": {
+                  "type": "string"
+                },
+                "Windows": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "toolchains": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": ["stable", "nightly"]
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": ["default"]
+            },
+            "rustlog": {
+              "type": "string",
+              "default": "info"
+            },
+            "fireblocks": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "set-env-vars": {
+                  "type": "boolean",
+                  "default": true
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["packages", "fireblocks"],
+          "additionalProperties": false
+        },
+        "release": {
+          "type": "object",
+          "properties": {
+            "cargo_publish": {
+              "type": "boolean",
+              "default": true
+            },
+            "profile": {
+              "type": "string",
+              "default": "release"
+            },
+            "os": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "string"
+                  },
+                  "os": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["target", "os"],
+                "additionalProperties": false
+              },
+              "default": [
+                {
+                  "target": "x86_64-unknown-linux-gnu",
+                  "os": "ubicloud-standard-4"
+                },
+                {
+                  "target": "aarch64-apple-darwin",
+                  "os": "macos-latest"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "jobs": {
+          "type": "object",
+          "properties": {
+            "coverage": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "args": {
+                  "type": "string"
+                },
+                "run": {
+                  "type": "string"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "os": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
+                    },
+                    "toolchains": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": ["stable"]
+                    },
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": ["default"]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["if", "continue-on-error", "args", "run", "matrix"],
+              "additionalProperties": false
+            },
+            "fmt": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "run": {
+                  "type": "string"
+                }
+              },
+              "required": ["if", "continue-on-error", "run"],
+              "additionalProperties": false
+            },
+            "clippy": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "flags": {
+                  "type": "string"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "os": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
+                    },
+                    "toolchains": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": ["stable", "nightly"]
+                    },
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": ["default"]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["if", "continue-on-error", "flags", "matrix"],
+              "additionalProperties": false
+            },
+            "semver": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["if", "continue-on-error"],
+              "additionalProperties": false
+            },
+            "hack": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "run": {
+                  "type": "string"
+                }
+              },
+              "required": ["if", "continue-on-error", "run"],
+              "additionalProperties": false
+            },
+            "doc": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "run": {
+                  "type": "string"
+                }
+              },
+              "required": ["if", "continue-on-error", "run"],
+              "additionalProperties": false
+            },
+            "dependencies": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "run": {
+                  "type": "string"
+                }
+              },
+              "required": ["if", "continue-on-error", "run"],
+              "additionalProperties": false
+            },
+            "cargo-sort": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean"
+                },
+                "continue-on-error": {
+                  "type": "boolean"
+                },
+                "run": {
+                  "type": "string"
+                }
+              },
+              "required": ["if", "continue-on-error", "run"],
+              "additionalProperties": false
+            },
+            "sanitizers": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "os": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
+                    },
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": ["features"],
+                  "additionalProperties": false
+                },
+                "address": {
+                  "type": "object",
+                  "properties": {
+                    "if": {
+                      "type": "boolean"
+                    },
+                    "continue-on-error": {
+                      "type": "boolean"
+                    },
+                    "run": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["if", "continue-on-error", "run"],
+                  "additionalProperties": false
+                },
+                "leak": {
+                  "type": "object",
+                  "properties": {
+                    "if": {
+                      "type": "boolean"
+                    },
+                    "continue-on-error": {
+                      "type": "boolean"
+                    },
+                    "run": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["if", "continue-on-error", "run"],
+                  "additionalProperties": false
+                },
+                "thread": {
+                  "type": "object",
+                  "properties": {
+                    "if": {
+                      "type": "boolean"
+                    },
+                    "continue-on-error": {
+                      "type": "boolean"
+                    },
+                    "run": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["if", "continue-on-error", "run"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["enabled", "matrix", "address", "leak", "thread"],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "coverage",
+            "fmt",
+            "clippy",
+            "semver",
+            "hack",
+            "doc",
+            "dependencies",
+            "cargo-sort",
+            "sanitizers"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["global", "release", "jobs"],
+      "additionalProperties": false,
+      "description": "RUST CI Configuration"
+    }
   },
   "$schema": "http://json-schema.org/draft-07/schema#"
 }

@@ -1,5 +1,6 @@
 global:
-  ubuntu_packages: 'curl'
+  packages:
+    Linux: 'curl'
   rustlog: debug
   fireblocks:
     enabled: true

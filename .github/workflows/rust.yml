@@ -38,7 +38,7 @@ jobs:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          packages: ${{ fromJSON(needs.config.outputs.config).global.packages }}
       - name: fireblocks
         uses: carteramesh/fireblocks-config-action@main
         if: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.enabled }}
@@ -102,7 +102,7 @@ jobs:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          packages: ${{ fromJSON(needs.config.outputs.config).global.packages }}
       - name: ${{ matrix.toolchains }} cargo clippy (${{ matrix.features }})
         uses: giraffate/clippy-action@v1
         with:
@@ -121,7 +121,7 @@ jobs:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          packages: ${{ fromJSON(needs.config.outputs.config).global.packages }}
       - name: cargo-semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2
         # with:
@@ -137,7 +137,7 @@ jobs:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          packages: ${{ fromJSON(needs.config.outputs.config).global.packages }}
       - name: Install cargo-hack
         uses: baptiste0928/cargo-install@v3
         with:
@@ -156,7 +156,7 @@ jobs:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          packages: ${{ fromJSON(needs.config.outputs.config).global.packages }}
       - name: Install cargo-docs-rs
         uses: baptiste0928/cargo-install@v3
         with:
@@ -209,7 +209,7 @@ jobs:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
+          packages: ${{ fromJSON(needs.config.outputs.config).global.packages }}
       - name: fireblocks
         uses: carteramesh/fireblocks-config-action@main
         if: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.enabled }}

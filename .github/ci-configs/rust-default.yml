@@ -1,5 +1,9 @@
 global:
-  ubuntu_packages: ''
+  # to match $RUNNER_OS
+  packages:
+    Linux: ''
+    macOS: ''
+    Windows: ''
   toolchains:
     - stable
     - nightly

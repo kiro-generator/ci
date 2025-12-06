@@ -4,8 +4,8 @@ inputs:
   git_token:
     description: 'Token to authenticate for git'
     required: false
-  ubuntu_packages:
-    description: 'Packages to install'
+  packages:
+    description: 'Packages to install per OS, see .github/ci-configs/rust-default.yml'
     required: false
     default: ''
   ref:
@@ -48,13 +48,29 @@ runs:
 
     - name: packages
       shell: bash
-      if: ${{ inputs.ubuntu_packages }}
+      if: ${{ inputs.packages }}
       run: |
-        if ! which apt-get ; then
-           echo "No apt-get found"
-           exit 0
+        case $RUNNER_OS in
+          Linux)
+            packages=${{ fromJSON(inputs.packages).Linux }}
+            _os='linux'
+            ;;
+          macOS)
+            _os='darwin'
+            packages=${{ fromJSON(inputs.packages).macOS }}
+            ;;
+
+          *)
+            echo "Cannot handle OS of type $RUNNER_OS"
+            echo "Expected one of: [ Linux macOS ]"
+            exit 0
+            ;;
+        esac
+
+        if [ -z "$packages" ]; then
+          echo "No packages to install"
+          exit 0
         fi
-        if [ -x "$(which apt-get)" ] ; then
-          set -x
-          sudo apt-get install -y ${{ inputs.ubuntu_packages }}
-        fi
+
+        echo "Installing packages: $packages"
+        sudo $packages
