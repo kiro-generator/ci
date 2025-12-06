@@ -23,19 +23,17 @@ jobs:
         id: merge
         uses: carteramesh/ci/.github/actions/rust-config@main
         with:
-          token: ${{ github.token }}
+          git_token: ${{ github.token }}
           runner: ${{ inputs.runner }}
 
   coverage:
     runs-on: ${{ matrix.os }}
     needs: [config]
     if: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.if }}
-    name: coverage / ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchain }}
+    name: coverage / ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchains }}
     strategy:
       fail-fast: false
-      matrix:
-        os: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.os }}
-        features: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.features }}
+      matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.coverage.matrix)) }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
@@ -55,7 +53,7 @@ jobs:
       - name: llvm-tools
         shell: bash
         run: |
-          rustup default ${{ matrix.toolchain }}
+          rustup default ${{ matrix.toolchains }}
           rustup component add llvm-tools-preview
           cargo install cargo-llvm-cov
       - name: cargo generate-lockfile
@@ -93,18 +91,18 @@ jobs:
     needs: [config]
     runs-on: ${{ matrix.os }}
     if: ${{ fromJSON(needs.config.outputs.config).jobs.clippy.if }}
-    name: ${{ matrix.toolchain }} / clippy / ${{ matrix.features }} / ${{ matrix.os }}
+    name: ${{ matrix.toolchains }} / clippy / ${{ matrix.features }} / ${{ matrix.os }}
     permissions:
       contents: read
       checks: write
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.config.outputs.config).jobs.clippy.matrix }}
+      matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.clippy.matrix)) }}
     steps:
       - name: Init
         uses: carteramesh/ci/.github/actions/rust-init@main
         with:
-          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config.global.ubuntu_packages) }}
+          ubuntu_packages: ${{ fromJSON(needs.config.outputs.config).global.ubuntu_packages }}
       - name: ${{ matrix.toolchains }} cargo clippy (${{ matrix.features }})
         uses: giraffate/clippy-action@v1
         with:
