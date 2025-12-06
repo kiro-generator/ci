@@ -54,10 +54,10 @@ runs:
         packages=""
         case $RUNNER_OS in
           Linux)
-            packages=${{ fromJSON(inputs.packages).Linux }}
+            packages="${{ fromJSON(inputs.packages).Linux }}"
             ;;
           macOS)
-            packages=${{ fromJSON(inputs.packages).macOS }}
+            packages="${{ fromJSON(inputs.packages).macOS }}"
             ;;
           *)
             echo "Cannot handle OS of type $RUNNER_OS"
