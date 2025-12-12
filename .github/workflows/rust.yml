@@ -261,3 +261,20 @@ jobs:
         run: cargo test --target ${_rust_target} -- --test-threads=1 --no-capture
         env:
           RUSTFLAGS: '-Z sanitizer=thread'
+
+  extra:
+    needs: [config]
+    runs-on: ${{ fromJSON(needs.config.outputs.config).runner }}
+    name: ${{ fromJSON(needs.config.outputs.config).jobs.extra.name }}
+    if: ${{ fromJSON(needs.config.outputs.config).jobs.extra.if }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.sanitizers.matrix)) }}
+    steps:
+      - name: Init
+        uses: carteramesh/ci/.github/actions/rust-init@main
+        with:
+          packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
+      - name: ${{ fromJSON(needs.config.outputs.config).jobs.extra.name }}
+        run: |
+          ${{ fromJSON(needs.config.outputs.config).jobs.extra.run }}

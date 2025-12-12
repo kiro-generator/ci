@@ -101,6 +101,19 @@ export const ConfigSchema = z
         'continue-on-error': z.boolean(),
         run: z.string(),
       }),
+      extra: z
+        .object({
+          if: z.boolean().default(false),
+          'continue-on-error': z.boolean().default(false),
+          name: z.string().default('extra'),
+          run: z.string().default('echo "Running extra job"'),
+          matrix: z.object({
+            os: z.array(z.string()).default([]),
+            toolchains: z.array(z.string()).default(['stable']),
+            features: z.array(z.string()).default(['default']),
+          }),
+        })
+        .optional(),
       sanitizers: z.object({
         enabled: z.boolean(),
         matrix: z.object({

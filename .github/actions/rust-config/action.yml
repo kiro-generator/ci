@@ -37,8 +37,8 @@ runs:
         # env | grep GITHUB | sort
         BRANCH_ACTION_CONFIG=""
         BRANCH_CONFIG=""
-        if [ -d  "${{ github.action_path }}/../../ci-configs/$GITHUB_REF_NAME" ]; then
-          BRANCH_ACTION_CONFIG="${{ github.action_path }}/../../ci-configs/$GITHUB_REF_NAME/rust*.yml"
+        if [ -d  "${{ github.action_path }}/../../ci-configs/rust" ]; then
+          BRANCH_ACTION_CONFIG="${{ github.action_path }}/../../ci-configs/rust/*.yml"
         fi
         if [ -d "../../ci-configs/$GITHUB_REF_NAME" ]; then
           BRANCH_CONFIG="../../ci-configs/$GITHUB_REF_NAME/rust*.yml"

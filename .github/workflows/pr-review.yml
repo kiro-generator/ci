@@ -8,7 +8,7 @@ jobs:
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@jobtaker')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@jobtaker')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@jobtaker')) ||
-      (contains(github.event.pull_request.labels.*.name, 'jobtaker') ||
+      (contains(github.event.pull_request.labels.*.name, 'jobtaker')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@jobtaker') || contains(github.event.issue.title, '@jobtaker')))
     runs-on: ${{ vars.RUNNER }}
     name: generate config
@@ -27,7 +27,7 @@ jobs:
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@jobtaker')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@jobtaker')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@jobtaker')) ||
-      (contains(github.event.pull_request.labels.*.name, 'jobtaker') ||
+      (contains(github.event.pull_request.labels.*.name, 'jobtaker')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@jobtaker') || contains(github.event.issue.title, '@jobtaker')))
     runs-on: ${{ vars.RUNNER }}
     needs: [config]

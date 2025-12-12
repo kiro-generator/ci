@@ -19,7 +19,16 @@ const { run } = await import('../src/main.js');
 describe('main.ts', () => {
   beforeEach(() => {
     const raw = fs.readFileSync('.github/ci-configs/rust-default.yml', 'utf8');
-    const config = yaml.load(raw, { json: true });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const config: any = yaml.load(raw, { json: true });
+    config['ai'] = {
+      enabled: true,
+      allowed_bots: '*',
+      claude_args: '--allowedTools',
+      use_sticky_comment: false,
+      track_progress: true,
+      prompt: 'blah',
+    };
     // Set the action's inputs as return values from core.getInput().
     core.getInput.mockImplementation(() => JSON.stringify(config));
   });

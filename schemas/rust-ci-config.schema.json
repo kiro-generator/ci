@@ -324,6 +324,56 @@
               "required": ["if", "continue-on-error", "run"],
               "additionalProperties": false
             },
+            "extra": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "continue-on-error": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "name": {
+                  "type": "string",
+                  "default": "extra"
+                },
+                "run": {
+                  "type": "string",
+                  "default": "echo \"Running extra job\""
+                },
+                "matrix": {
+                  "type": "object",
+                  "properties": {
+                    "os": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
+                    },
+                    "toolchains": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": ["stable"]
+                    },
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": ["default"]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": ["matrix"],
+              "additionalProperties": false
+            },
             "sanitizers": {
               "type": "object",
               "properties": {

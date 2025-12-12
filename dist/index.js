@@ -31124,6 +31124,18 @@ const ConfigSchema = objectType({
             'continue-on-error': booleanType(),
             run: stringType(),
         }),
+        extra: objectType({
+            if: booleanType().default(false),
+            'continue-on-error': booleanType().default(false),
+            name: stringType().default('extra'),
+            run: stringType().default('echo "Running extra job"'),
+            matrix: objectType({
+                os: arrayType(stringType()).default([]),
+                toolchains: arrayType(stringType()).default(['stable']),
+                features: arrayType(stringType()).default(['default']),
+            }),
+        })
+            .optional(),
         sanitizers: objectType({
             enabled: booleanType(),
             matrix: objectType({
