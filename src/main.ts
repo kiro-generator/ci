@@ -11,7 +11,7 @@ export const ConfigSchema = z
       claude_args: z.string().optional(),
       use_sticky_comment: z.boolean().default(false),
       track_progress: z.boolean().default(true),
-      settings: z.string().optional(),
+      settings: z.any().optional().default({}),
       prompt: z.string(),
     }),
     global: z.object({

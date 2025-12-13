@@ -1,7 +1,7 @@
 on:
   workflow_call:
 
-name: check test
+name: jobtaker
 jobs:
   config:
     if: |
@@ -47,7 +47,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: '@jobtaker'
-          settings: ${{ fromJSON(needs.config.outputs.config).ai.settings }}
+          settings: ${{ toJSON(fromJSON(needs.config.outputs.config).ai.settings) }}
           #            description: "Claude Code settings as JSON string or path to settings JSON file"
           allowed_bots: ${{ fromJSON(needs.config.outputs.config).ai.allowed_bots }}
           #            description: "Comma-separated list of allowed bot usernames, or '*' to allow all bots. Empty string (default) allows no bots."

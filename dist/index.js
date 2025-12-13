@@ -31018,6 +31018,7 @@ var ZodFirstPartyTypeKind;
 })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
 const stringType = ZodString.create;
 const booleanType = ZodBoolean.create;
+const anyType = ZodAny.create;
 ZodNever.create;
 const arrayType = ZodArray.create;
 const objectType = ZodObject.create;
@@ -31037,7 +31038,7 @@ const ConfigSchema = objectType({
         claude_args: stringType().optional(),
         use_sticky_comment: booleanType().default(false),
         track_progress: booleanType().default(true),
-        settings: stringType().optional(),
+        settings: anyType().optional().default({}),
         prompt: stringType(),
     }),
     global: objectType({
