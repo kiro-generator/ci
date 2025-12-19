@@ -1,0 +1,53 @@
+name: Pages
+permissions:
+  contents: write # To push a branch
+  pages: write # To push to a GitHub Pages site
+  id-token: write # To update the deployment status
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: ${{ vars.RUNNER }}
+        required: false
+
+jobs:
+  config:
+    runs-on: ${{ inputs.runner || vars.RUNNER }}
+    name: generate config
+    outputs:
+      config: ${{ steps.merge.outputs.config }}
+    steps:
+      - name: merge
+        id: merge
+        uses: carteramesh/ci/.github/actions/rust-config@main
+        with:
+          git_token: ${{ github.token }}
+          runner: ${{ inputs.runner }}
+  mdbook:
+    runs-on: ${{ vars.RUNNER }}
+    needs: ['config']
+    if: ${{ fromJSON(needs.config.outputs.config).pages.mdbook.if }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: ${{ fromJSON(needs.config.outputs.config).pages.mdbook.version }}
+
+      - name: Build Book
+        run: |
+          cd ${{ fromJSON(needs.config.outputs.config).pages.mdbook.path }}
+          ${{ fromJSON(needs.config.outputs.config).pages.mdbook.command }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ fromJSON(needs.config.outputs.config).pages.mdbook.path }}/book
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

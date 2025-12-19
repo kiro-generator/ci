@@ -14,6 +14,13 @@ global:
     enabled: false
     set-env-vars: true
 
+pages:
+  mdbook:
+    if: false
+    path: docs
+    version: latest
+    command: mdbook build
+
 release:
   cargo-publish: true # release to cargo, otherwise just tag
   profile: 'release'

@@ -7,6 +7,34 @@
         "runner": {
           "type": "string"
         },
+        "pages": {
+          "type": "object",
+          "properties": {
+            "mdbook": {
+              "type": "object",
+              "properties": {
+                "if": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "version": {
+                  "type": "string",
+                  "default": "latest"
+                },
+                "path": {
+                  "type": "string",
+                  "default": "docs"
+                },
+                "command": {
+                  "type": "string",
+                  "default": "mdbook build"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
         "ai": {
           "type": "object",
           "properties": {
@@ -30,7 +58,7 @@
               "default": true
             },
             "settings": {
-              "type": "string"
+              "default": {}
             },
             "prompt": {
               "type": "string"
@@ -453,21 +481,9 @@
               "additionalProperties": false
             }
           },
-          "required": [
-            "coverage",
-            "fmt",
-            "clippy",
-            "semver",
-            "hack",
-            "doc",
-            "dependencies",
-            "cargo-sort",
-            "sanitizers"
-          ],
           "additionalProperties": false
         }
       },
-      "required": ["ai", "global", "release", "jobs"],
       "additionalProperties": false,
       "description": "RUST CI Configuration"
     }

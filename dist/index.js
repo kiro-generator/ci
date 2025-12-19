@@ -31030,9 +31030,19 @@ ZodPromise.create;
 ZodOptional.create;
 ZodNullable.create;
 
-const ConfigSchema = objectType({
-    runner: stringType().optional(),
-    ai: objectType({
+function schema_pages() {
+    return objectType({
+        mdbook: objectType({
+            if: booleanType().default(false),
+            version: stringType().default('latest'),
+            path: stringType().default('docs'),
+            command: stringType().default('mdbook build'),
+        })
+            .optional(),
+    });
+}
+function schema_ai() {
+    return objectType({
         enabled: booleanType().default(true),
         allowed_bots: stringType().default('*'),
         claude_args: stringType().optional(),
@@ -31040,8 +31050,10 @@ const ConfigSchema = objectType({
         track_progress: booleanType().default(true),
         settings: anyType().optional().default({}),
         prompt: stringType(),
-    }),
-    global: objectType({
+    });
+}
+function schema_global() {
+    return objectType({
         packages: objectType({
             Linux: stringType().optional(),
             macOS: stringType().optional(),
@@ -31054,8 +31066,10 @@ const ConfigSchema = objectType({
             enabled: booleanType().default(false),
             'set-env-vars': booleanType().default(true),
         }),
-    }),
-    release: objectType({
+    });
+}
+function schema_release() {
+    return objectType({
         cargo_publish: booleanType().default(true),
         profile: stringType().default('release'),
         os: arrayType(objectType({
@@ -31073,92 +31087,149 @@ const ConfigSchema = objectType({
                 os: 'macos-latest',
             },
         ]),
-    }),
+    });
+}
+function schema_job_coverage() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        args: stringType(),
+        run: stringType(),
+        matrix: objectType({
+            os: arrayType(stringType()).default([]),
+            toolchains: arrayType(stringType()).default(['stable']),
+            features: arrayType(stringType()).default(['default']),
+        }),
+    });
+}
+function schema_job_fmt() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        run: stringType(),
+    });
+}
+function schema_job_clippy() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        flags: stringType(),
+        matrix: objectType({
+            os: arrayType(stringType()).default([]),
+            toolchains: arrayType(stringType()).default(['stable', 'nightly']),
+            features: arrayType(stringType()).default(['default']),
+        }),
+    });
+}
+function schema_job_semver() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+    });
+}
+function schema_job_hack() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        run: stringType(),
+    });
+}
+function schema_job_doc() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        run: stringType(),
+    });
+}
+function schema_job_dependencies() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        run: stringType(),
+    });
+}
+function schema_job_cargo_sort() {
+    return objectType({
+        if: booleanType(),
+        'continue-on-error': booleanType(),
+        run: stringType(),
+    });
+}
+function schema_job_extra() {
+    return objectType({
+        if: booleanType().default(false),
+        'continue-on-error': booleanType().default(false),
+        name: stringType().default('extra'),
+        run: stringType().default('echo "Running extra job"'),
+        matrix: objectType({
+            os: arrayType(stringType()).default([]),
+            toolchains: arrayType(stringType()).default(['stable']),
+            features: arrayType(stringType()).default(['default']),
+        }),
+    });
+}
+function schema_job_sanitizers() {
+    return objectType({
+        enabled: booleanType(),
+        matrix: objectType({
+            os: arrayType(stringType()).default([]),
+            features: arrayType(stringType()),
+        }),
+        address: objectType({
+            if: booleanType(),
+            'continue-on-error': booleanType(),
+            run: stringType(),
+        }),
+        leak: objectType({
+            if: booleanType(),
+            'continue-on-error': booleanType(),
+            run: stringType(),
+        }),
+        thread: objectType({
+            if: booleanType(),
+            'continue-on-error': booleanType(),
+            run: stringType(),
+        }),
+    });
+}
+objectType({
+    runner: stringType().optional(),
+    pages: schema_pages().optional(),
+    ai: schema_ai().optional(),
+    global: schema_global().optional(),
+    release: schema_release().optional(),
     jobs: objectType({
-        coverage: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            args: stringType(),
-            run: stringType(),
-            matrix: objectType({
-                os: arrayType(stringType()).default([]),
-                toolchains: arrayType(stringType()).default(['stable']),
-                features: arrayType(stringType()).default(['default']),
-            }),
-        }),
-        fmt: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            run: stringType(),
-        }),
-        clippy: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            flags: stringType(),
-            matrix: objectType({
-                os: arrayType(stringType()).default([]),
-                toolchains: arrayType(stringType()).default(['stable', 'nightly']),
-                features: arrayType(stringType()).default(['default']),
-            }),
-        }),
-        semver: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-        }),
-        hack: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            run: stringType(),
-        }),
-        doc: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            run: stringType(),
-        }),
-        dependencies: objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            run: stringType(),
-        }),
-        'cargo-sort': objectType({
-            if: booleanType(),
-            'continue-on-error': booleanType(),
-            run: stringType(),
-        }),
-        extra: objectType({
-            if: booleanType().default(false),
-            'continue-on-error': booleanType().default(false),
-            name: stringType().default('extra'),
-            run: stringType().default('echo "Running extra job"'),
-            matrix: objectType({
-                os: arrayType(stringType()).default([]),
-                toolchains: arrayType(stringType()).default(['stable']),
-                features: arrayType(stringType()).default(['default']),
-            }),
-        })
-            .optional(),
-        sanitizers: objectType({
-            enabled: booleanType(),
-            matrix: objectType({
-                os: arrayType(stringType()).default([]),
-                features: arrayType(stringType()),
-            }),
-            address: objectType({
-                if: booleanType(),
-                'continue-on-error': booleanType(),
-                run: stringType(),
-            }),
-            leak: objectType({
-                if: booleanType(),
-                'continue-on-error': booleanType(),
-                run: stringType(),
-            }),
-            thread: objectType({
-                if: booleanType(),
-                'continue-on-error': booleanType(),
-                run: stringType(),
-            }),
-        }),
+        coverage: schema_job_coverage().optional(),
+        fmt: schema_job_fmt().optional(),
+        clippy: schema_job_clippy().optional(),
+        semver: schema_job_semver().optional(),
+        hack: schema_job_hack().optional(),
+        doc: schema_job_doc().optional(),
+        dependencies: schema_job_dependencies().optional(),
+        'cargo-sort': schema_job_cargo_sort().optional(),
+        extra: schema_job_extra().optional(),
+        sanitizers: schema_job_sanitizers().optional(),
+    })
+        .optional(),
+})
+    .describe('RUST CI Configuration');
+const ConfigSchema = objectType({
+    runner: stringType().optional(),
+    pages: schema_pages(),
+    ai: schema_ai(),
+    global: schema_global(),
+    release: schema_release(),
+    jobs: objectType({
+        coverage: schema_job_coverage(),
+        fmt: schema_job_fmt(),
+        clippy: schema_job_clippy(),
+        semver: schema_job_semver(),
+        hack: schema_job_hack(),
+        doc: schema_job_doc(),
+        dependencies: schema_job_dependencies(),
+        'cargo-sort': schema_job_cargo_sort(),
+        extra: schema_job_extra().optional(),
+        sanitizers: schema_job_sanitizers(),
     }),
 })
     .describe('RUST CI Configuration');

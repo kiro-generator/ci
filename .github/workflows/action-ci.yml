@@ -94,6 +94,7 @@ jobs:
           runner="${{ fromJSON(steps.test-action.outputs.config).runner }}"
           rustlog="${{ fromJSON(steps.test-action.outputs.config).global.rustlog }}"
           packages="${{ fromJSON(steps.test-action.outputs.config).global.packages.Linux }}"
+          pages="${{ fromJSON(steps.test-action.outputs.config).pages.mdbook.if }}"
           if [ "$runner" != "${{ matrix.os }}" ]; then
             echo "Runner mismatch ${runner} != ${{ matrix.os }}"
             exit 1
@@ -107,4 +108,9 @@ jobs:
               echo "mismatch ${packages} != curl"
               exit 1
             fi
+          fi
+
+          if [ "$pages" != "false" ]; then
+            echo "pages should be false"
+            exit 1
           fi
