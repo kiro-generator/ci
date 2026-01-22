@@ -23,7 +23,7 @@ runs:
         token: ${{ inputs.git_token || github.token }}
     - name: generate
       id: generate
-      uses: carteramesh/ci@main
+      uses: dougefresh/ci@main
     - name: replace runners
       id: config
       shell: bash

@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: merge
         id: merge
-        uses: carteramesh/ci/.github/actions/rust-config@main
+        uses: dougefresh/ci/.github/actions/rust-config@main
         with:
           git_token: ${{ github.token }}
           runner: ${{ inputs.runner }}
