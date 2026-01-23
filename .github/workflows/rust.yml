@@ -37,18 +37,6 @@ jobs:
         uses: dougefresh/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
-      - name: fireblocks
-        uses: dougefresh/fireblocks-config-action@main
-        if: false
-        # if: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.enabled }}
-        with:
-          fireblocks-secret: |
-            ${{ secrets.FIREBLOCKS_SECRET }}
-          fireblocks-api-key: ${{ secrets.FIREBLOCKS_API_KEY }}
-          fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
-          solana-rpc-url: ${{ secrets.RPC_URL }}
-          commitment: 'finalized'
-          # set-env-vars: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.set-env-vars }}
       - name: llvm-tools
         shell: bash
         run: |
@@ -203,17 +191,6 @@ jobs:
         uses: dougefresh/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
-      - name: fireblocks
-        uses: dougefresh/fireblocks-config-action@main
-        if: false
-        # if: ${{ fromJSON(needs.config.outputs.config).global.fireblocks.enabled }}
-        with:
-          fireblocks-secret: |
-            ${{ secrets.FIREBLOCKS_SECRET }}
-          fireblocks-api-key: ${{ secrets.FIREBLOCKS_API_KEY }}
-          fireblocks-endpoint: ${{ vars.FIREBLOCKS_ENDPOINT }}
-          solana-rpc-url: ${{ secrets.RPC_URL }}
-          commitment: 'finalized'
       - name: Enable debug symbols
         run: |
           #rustup target add x86_64-unknown-linux-gnu
