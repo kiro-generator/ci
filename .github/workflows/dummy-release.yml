@@ -23,7 +23,7 @@ on:
         required: false
 jobs:
   releaser:
-    if: true
+    if: false
     name: release
     uses: ./.github/workflows/rust-release.yml
     secrets: inherit
