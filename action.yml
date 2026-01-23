@@ -21,7 +21,11 @@ runs:
           echo "::error::Missing .github/rust-ci.ts config file"
           exit 1
         fi
-        cp -v .github/rust-ci.ts ${{ github.action_path }}/.github/
+        if [ .github/rust-ci.ts -ef ${{ github.action_path }}/.github/rust-ci.ts ]; then
+          echo "Running in action repo, skipping copy"
+        else
+          cp -v .github/rust-ci.ts ${{ github.action_path }}/.github/
+        fi
         cat ${{ github.action_path }}/.github/rust-ci.ts
         cd ${{ github.action_path }}
         CONFIG="$(bun run ./scripts/generate-rust.ts | jq . --compact-output )"
