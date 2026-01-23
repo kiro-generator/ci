@@ -28,58 +28,32 @@ jobs:
             exit 1
           fi
       - name: jobtaker
+        if: ${{ fromJSON(needs.config.outputs.config).ai.enabled }}
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: '@jobtaker'
-          # settings: ${{ toJSON(fromJSON(needs.config.outputs.config).ai.settings) }}
+          settings: ${{ toJSON(fromJSON(needs.config.outputs.config).ai.settings) }}
           #            description: "Claude Code settings as JSON string or path to settings JSON file"
-          allowed_bots: '*'
+          allowed_bots: ${{ fromJSON(needs.config.outputs.config).ai.allowed_bots }}
           #            description: "Comma-separated list of allowed bot usernames, or '*' to allow all bots. Empty string (default) allows no bots."
           # Your custom review instructions
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Provide detailed feedback using inline comments for ONLY issues, no praise inline comments.
-            Use top-level comments for general observations or praise
-            Do not be shy, I am a big boy and can handle criticism gracefully. I welcome feedback and suggestions.
+            ${{ fromJSON(needs.config.outputs.config).ai.prompt }}
 
-            Review this PR against our team checklist:
+            ---
 
-            ## Code Quality
-            - [ ] Code follows our style guide
-            - [ ] No commented-out code
-            - [ ] Meaningful variable names
-            - [ ] DRY principle followed
-
-            ## Testing
-            - [ ] Unit tests for new functions
-            - [ ] Integration tests for new endpoints
-            - [ ] Edge cases covered
-            - [ ] Test coverage > 80%
-
-            ## Documentation
-            - [ ] README updated if needed
-            - [ ] API docs updated
-            - [ ] Inline comments for complex logic
-            - [ ] CHANGELOG.md updated
-
-            ## Security
-            - [ ] No hardcoded credentials
-            - [ ] Input validation implemented
-            - [ ] Proper error handling
-            - [ ] No sensitive data in logs
-
-            For each item, check if it is satisfied and comment on any that need attention.
-            Post a summary comment with checklist results.
+            ${{ fromJSON(needs.config.outputs.config).ai.additional}}
           # Tools for comprehensive PR review
-          # claude_args: ${{ fromJSON(needs.config.outputs.config).ai.claude_args }}
-          use_sticky_comment: false
+          claude_args: ${{ fromJSON(needs.config.outputs.config).ai.claude_args }}
+          use_sticky_comment: ${{ fromJSON(needs.config.outputs.config).ai.use_sticky_comment }}
           # description: "Use just one comment to deliver issue/PR comments"
           # required: false
           # default: "false"
-          track_progress: true
+          track_progress: ${{ fromJSON(needs.config.outputs.config).ai.track_progress }}
           #            description: "Force tag mode with tracking comments for pull_request and issue events. Only applicable to pull_request (opened, synchronize, ready_for_review, reopened) and issue (opened, edited, labeled, assigned) events."
           path_to_claude_code_executable: ''
           #           description: "Optional path to a custom Claude Code executable. If provided, skips automatic installation and uses this executable instead. WARNING: Using an older version may cause problems if the action begins taking advantage of new Claude Code features. This input is typically not needed unless you're debugging something specific or have unique needs in your environment."
