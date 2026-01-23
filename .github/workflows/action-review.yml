@@ -1,0 +1,14 @@
+name: jobtaker
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  id-token: write
+jobs:
+  jobtaker:
+    name: bot
+    uses: ./.github/workflows/pr-review.yml@main
+    secrets: inherit

@@ -20,6 +20,12 @@ You should have access to cargo cli. You can use this to verify the build yourse
 If you encounter an error running cargo, please comment on this PR. If you desire more rust tools, such as rust-analyzer, or any cargo plugin to help review then please notify on pull request
 
 
+## Permissions
+
+If you are denied access to a tool, shell command, or github API resource (via gh cli) then notify the pull request author that you would like access to that tool.
+As an example, we use CodeCov to our test coverage, if you like to have access to historical data, we can provide you with the CodeCov CLI tool and access.
+In general, if you need something, just ask.
+
 Review this PR against our team checklist:
 
 ## Code Quality

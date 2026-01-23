@@ -196,7 +196,8 @@ export class RustWorkflow {
       enabled: true,
       track_progress: true,
       allowed_bots: '*',
-      claude_args: '',
+      claude_args:
+        ' --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(cargo .*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"',
       use_sticky_comment: false,
     };
   }

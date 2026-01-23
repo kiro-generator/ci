@@ -1,7 +1,6 @@
 name: jobtaker
 on:
-  pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
+  workflow_call:
 permissions:
   contents: read
   checks: write
@@ -16,10 +15,6 @@ jobs:
       (contains(github.event.pull_request.labels.*.name, 'jobtaker')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@jobtaker') || contains(github.event.issue.title, '@jobtaker')))
     runs-on: ${{ vars.RUNNER }}
-    permissions:
-      contents: read
-      pull-requests: write
-      id-token: write
     steps:
       - name: Validate ANTHROPIC_API_KEY
         shell: bash
@@ -33,7 +28,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: '@jobtaker'
-          settings: ${{ toJSON(fromJSON(needs.config.outputs.config).ai.settings) }}
+          # settings: ${{ toJSON(fromJSON(needs.config.outputs.config).ai.settings) }}
           #            description: "Claude Code settings as JSON string or path to settings JSON file"
           allowed_bots: ${{ fromJSON(needs.config.outputs.config).ai.allowed_bots }}
           #            description: "Comma-separated list of allowed bot usernames, or '*' to allow all bots. Empty string (default) allows no bots."
@@ -46,14 +41,14 @@ jobs:
 
             ---
 
-            ${{ fromJSON(needs.config.outputs.config).ai.additional}}
+            ${{ fromJSON(needs.config.outputs.config).ai.additional }}
           # Tools for comprehensive PR review
           claude_args: ${{ fromJSON(needs.config.outputs.config).ai.claude_args }}
           use_sticky_comment: ${{ fromJSON(needs.config.outputs.config).ai.use_sticky_comment }}
           # description: "Use just one comment to deliver issue/PR comments"
           # required: false
           # default: "false"
-          track_progress: ${{ fromJSON(needs.config.outputs.config).ai.track_progress }}
+          track_progress: "${{ fromJSON(needs.config.outputs.config).ai.track_progress }"
           #            description: "Force tag mode with tracking comments for pull_request and issue events. Only applicable to pull_request (opened, synchronize, ready_for_review, reopened) and issue (opened, edited, labeled, assigned) events."
           path_to_claude_code_executable: ''
           #           description: "Optional path to a custom Claude Code executable. If provided, skips automatic installation and uses this executable instead. WARNING: Using an older version may cause problems if the action begins taking advantage of new Claude Code features. This input is typically not needed unless you're debugging something specific or have unique needs in your environment."
