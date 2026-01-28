@@ -221,6 +221,11 @@ export class RustWorkflow {
     return this;
   }
 
+  withRelease(r: Release) {
+    this.release = r;
+    return this;
+  }
+
   clippy(opts?: Partial<Clippy>) {
     if (opts?.flags) this.jobs.clippy.flags = opts.flags;
     if (opts?.run) this.jobs.clippy.run = opts.run;
