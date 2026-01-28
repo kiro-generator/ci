@@ -21,13 +21,13 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
       - name: Build
-        run: bun run build
+        run: bun install && bun run build
       - name: Get version
         id: version
         run: echo "tag=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
 
-      - name: Publish to GitHub Packages
-        run: bun publish
+      - name: Publish
+        run: bun publish --access public
 
       # - name: Publish to npm
         # run: npm publish --access public
