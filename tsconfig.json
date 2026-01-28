@@ -8,7 +8,7 @@
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
     "outDir": "./dist",
-    "roogDir": "./src",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

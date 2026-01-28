@@ -1,7 +1,7 @@
 {
   "name": "@dougefresh/ci",
   "description": "CI Mega Config github action",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "author": "",
   "type": "module",
   "homepage": "https://github.com/dougefresh/ci",
@@ -9,7 +9,9 @@
     "type": "git",
     "url": "git+https://github.com/dougefresh/ci.git"
   },
-  "keywords": ["actions"],
+  "keywords": [
+    "actions"
+  ],
   "exports": {
     ".": "./dist/index.js"
   },
