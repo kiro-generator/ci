@@ -66,6 +66,7 @@ interface RustJobs {
 }
 
 interface Release {
+  bin: boolean;
   publish: boolean;
   debian: boolean;
   profile: string;
@@ -186,6 +187,7 @@ export class RustWorkflow {
     this.global = { packages: {} };
     this.release = {
       publish: true,
+      bin: false,
       debian: false,
       profile: 'release',
       os: [Arch.AMD64],
@@ -260,6 +262,7 @@ export class RustWorkflow {
     return {
       ai: this.ai,
       release: {
+        bin: this.release.bin,
         publish: this.release.publish,
         debian: this.release.debian,
         profile: this.release.profile,

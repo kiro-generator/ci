@@ -2,10 +2,6 @@ name: Release
 on:
   workflow_call:
     inputs:
-      runner:
-        type: string
-        default: ${{ vars.RUNNER }}
-        required: false
       version:
         type: string
         required: true
@@ -27,6 +23,10 @@ jobs:
         id: config
         uses: dougefresh/ci/.github/actions/rust-config@main
         with:
+          arm64: ${{ vars.RUNNER_ARM64 }}
+          amd64: ${{ vars.RUNNER_AMD64 }}
+          # win: "windows-latest"
+          # mac: "macos-latest"
           git_token: ${{ github.token }}
   release:
     needs: [config]
