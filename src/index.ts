@@ -199,7 +199,7 @@ export class RustWorkflow {
       track_progress: true,
       allowed_bots: '*',
       claude_args:
-        ' --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(find),Bash(diff),Bash(jq),Bash(git),Bash(cargo),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"',
+        ' --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(find *),Bash(diff *),Bash(jq *),Bash(git *),Bash(cargo *),Bash(gh *)"',
       use_sticky_comment: false,
     };
   }
