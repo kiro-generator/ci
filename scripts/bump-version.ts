@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const type = process.argv[2] || 'patch';
 const pkg = JSON.parse(readFileSync('package.json', 'utf-8'));
@@ -12,5 +12,5 @@ pkg.version =
       ? `${major}.${minor + 1}.0`
       : `${major}.${minor}.${patch + 1}`;
 
-writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
 console.log(`Bumped to ${pkg.version}`);
