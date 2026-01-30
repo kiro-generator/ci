@@ -1,2 +1,3 @@
 #!/bin/bash
-bun run precommit
+bun run precommit &&
+  bun run scripts/generate-rust.ts >/dev/null
