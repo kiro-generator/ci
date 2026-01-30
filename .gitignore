@@ -1,4 +1,5 @@
 # Dependency directory
+dist/
 node_modules
 target/
 Cargo.lock

@@ -8,7 +8,50 @@ permissions:
   pull-requests: write
   id-token: write
 jobs:
+  config:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@jobtaker')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@jobtaker')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@jobtaker')) ||
+      (contains(github.event.pull_request.labels.*.name, 'jobtaker')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@jobtaker') || contains(github.event.issue.title, '@jobtaker')))
+    runs-on: ${{ vars.RUNNER }}
+    name: generate config
+    outputs:
+      config: ${{ steps.config.outputs.config }}
+    steps:
+      - name: Validate ANTHROPIC_API_KEY
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            exit 1
+          fi
+      - uses: actions/checkout@v6
+      - name: config
+        id: config
+        uses: ./.github/actions/rust-config
+        with:
+          arm64: ${{ vars.RUNNER_ARM64 }}
+          amd64: ${{ vars.RUNNER_AMD64 }}
+          git_token: ${{ github.token }}
+  
   jobtaker:
-    name: bot
-    uses: ./.github/workflows/pr-review.yml
-    secrets: inherit
+    needs: [config]
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@jobtaker')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@jobtaker')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@jobtaker')) ||
+      (contains(github.event.pull_request.labels.*.name, 'jobtaker')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@jobtaker') || contains(github.event.issue.title, '@jobtaker')))
+    runs-on: ${{ vars.RUNNER }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: checkout
+        uses: ./.github/actions/rust-init
+        with:
+          packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
+      - name: jobtaker
+        uses: ./.github/actions/jobtaker
+        with:
+          config: ${{ needs.config.outputs.config }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}

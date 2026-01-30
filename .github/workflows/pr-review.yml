@@ -1,6 +1,11 @@
 name: jobtaker
 on:
   workflow_call:
+    inputs:
+      action_ref:
+        description: 'Ref to use for dougefresh/ci actions'
+        type: string
+        default: 'main'
 permissions:
   contents: read
   checks: write
@@ -48,46 +53,7 @@ jobs:
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: jobtaker
-        if: ${{ fromJSON(needs.config.outputs.config).ai.enabled }}
-        uses: anthropics/claude-code-action@v1
+        uses: dougefresh/ci/.github/actions/jobtaker@main
         with:
+          config: ${{ needs.config.outputs.config }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          trigger_phrase: '@jobtaker'
-          # settings: ${{ toJSON(fromJSON(needs.config.outputs.config).ai.settings) }}
-          #            description: "Claude Code settings as JSON string or path to settings JSON file"
-          allowed_bots: ${{ fromJSON(needs.config.outputs.config).ai.allowed_bots }}
-          #            description: "Comma-separated list of allowed bot usernames, or '*' to allow all bots. Empty string (default) allows no bots."
-          # Your custom review instructions
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-
-            ${{ fromJSON(needs.config.outputs.config).ai.prompt }}
-
-            ---
-
-            ${{ fromJSON(needs.config.outputs.config).ai.additional }}
-          # Tools for comprehensive PR review
-          claude_args: ${{ fromJSON(needs.config.outputs.config).ai.claude_args }}
-          use_sticky_comment: ${{ fromJSON(needs.config.outputs.config).ai.use_sticky_comment }}
-          # description: "Use just one comment to deliver issue/PR comments"
-          # required: false
-          # default: "false"
-          track_progress: "${{ fromJSON(needs.config.outputs.config).ai.track_progress }}"
-          #            description: "Force tag mode with tracking comments for pull_request and issue events. Only applicable to pull_request (opened, synchronize, ready_for_review, reopened) and issue (opened, edited, labeled, assigned) events."
-          path_to_claude_code_executable: ''
-          #           description: "Optional path to a custom Claude Code executable. If provided, skips automatic installation and uses this executable instead. WARNING: Using an older version may cause problems if the action begins taking advantage of new Claude Code features. This input is typically not needed unless you're debugging something specific or have unique needs in your environment."
-          path_to_bun_executable: ''
-          #            description: "Optional path to a custom Bun executable. If provided, skips automatic Bun installation and uses this executable instead. WARNING: Using an incompatible version may cause problems if the action requires specific Bun features. This input is typically not needed unless you're debugging something specific or have unique needs in your environment."
-          show_full_output: 'false'
-          #            description: "Show full JSON output from Claude Code. WARNING: This outputs ALL Claude messages including tool execution results which may contain secrets, API keys, or other sensitive information. These logs are publicly visible in GitHub Actions. Only enable for debugging in non-sensitive environments."
-          plugins: ''
-          #           description: "Newline-separated list of Claude Code plugin names to install (e.g., 'code-review@claude-code-plugins\nfeature-dev@claude-code-plugins')"
-          plugin_marketplaces: ''
-#            description: "Newline-separated list of Claude Code plugin marketplace Git URLs to install from (e.g., 'https://github.com/user/marketplace1.git\nhttps://github.com/user/marketplace2.git')"
-
-# When track_progress is enabled:
-# - Creates a tracking comment with progress checkboxes
-# - Includes all PR context (comments, attachments, images)
-# - Updates progress as the review proceeds
-# - Marks as completed when done

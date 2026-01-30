@@ -13,6 +13,24 @@ runs:
   steps:
     - name: setup bun
       uses: oven-sh/setup-bun@v2
+    - name: install
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}
+        bun install
+    - name: build
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}
+        bun run build
+    - id: prompt
+      shell: bash
+      run: |
+        sed -e 's/%REPO%/{{ github.repository }}/g' -e 's/%PR%/{{ github.event.pull_request.number }}/g' \
+          ${{ github.action_path }}/prompt-template.md > claude-prompt.md
+        if [ -f .github/additional-prompt.md ] ; then
+          cat .github/additional-prompt.md >> claude-prompt.md
+        fi
     - id: generate
       name: generate
       shell: bash
@@ -28,7 +46,5 @@ runs:
         fi
         cat ${{ github.action_path }}/.github/rust-ci.ts
         cd ${{ github.action_path }}
-        bun install
-        bun run build
         CONFIG="$(bun run ./scripts/generate-rust.ts | jq . --compact-output )"
         echo "config=$CONFIG" >> $GITHUB_OUTPUT

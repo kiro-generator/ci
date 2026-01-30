@@ -1,0 +1,29 @@
+name: 'Jobtaker Review'
+description: 'Runs Claude Code jobtaker with provided config'
+inputs:
+  config:
+    description: 'JSON config from rust-config action'
+    required: true
+  anthropic_api_key:
+    description: 'Anthropic API key'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: jobtaker
+      if: ${{ fromJSON(inputs.config).ai.enabled }}
+      uses: anthropics/claude-code-action@v1
+      with:
+        anthropic_api_key: ${{ inputs.anthropic_api_key }}
+        trigger_phrase: '@jobtaker'
+        allowed_bots: ${{ fromJSON(inputs.config).ai.allowed_bots }}
+        prompt_file: claude-prompt.md
+        claude_args: ${{ fromJSON(inputs.config).ai.claude_args }}
+        use_sticky_comment: ${{ fromJSON(inputs.config).ai.use_sticky_comment }}
+        track_progress: "${{ fromJSON(inputs.config).ai.track_progress }}"
+        path_to_claude_code_executable: ''
+        path_to_bun_executable: ''
+        show_full_output: 'false'
+        plugins: ''
+        plugin_marketplaces: ''
