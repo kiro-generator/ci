@@ -25,13 +25,10 @@ jobs:
       - name: Get version
         id: version
         run: echo "tag=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
-
-      - name: Publish
-        run: bun publish --access public
-
-      # - name: Publish to npm
-        # run: npm publish --access public
-
+      # - name: Publish
+        # run: bun publish --access public
+      - name: Publish to npm
+        run: npm publish
       - uses: softprops/action-gh-release@v2
         name: publish
         with:
