@@ -33,7 +33,7 @@ jobs:
           fi
       - name: config
         id: config
-        uses: dougefresh/ci/.github/actions/rust-config@prompt-file-str
+        uses: dougefresh/ci/.github/actions/rust-config@main
         with:
           arm64: ${{ vars.RUNNER_ARM64 }}
           amd64: ${{ vars.RUNNER_AMD64 }}
@@ -49,11 +49,11 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: checkout
-        uses: dougefresh/ci/.github/actions/rust-init@prompt-file-str
+        uses: dougefresh/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: jobtaker
-        uses: dougefresh/ci/.github/actions/jobtaker@prompt-file-str
+        uses: dougefresh/ci/.github/actions/jobtaker@main
         with:
           config: ${{ needs.config.outputs.config }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}

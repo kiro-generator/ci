@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: merge
         id: merge
-        uses: dougefresh/ci/.github/actions/rust-config@prompt-file-str
+        uses: dougefresh/ci/.github/actions/rust-config@main
         with:
           git_token: ${{ github.token }}
           runner: ${{ inputs.runner }}
