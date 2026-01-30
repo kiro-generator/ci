@@ -27,8 +27,12 @@ runs:
     - name: replace runners
       id: config
       shell: bash
+      env:
+        CONFIG_JSON: ${{ steps.generate.outputs.config }}
+        ARM64_RUNNER: ${{ inputs.arm64 }}
+        AMD64_RUNNER: ${{ inputs.amd64 }}
       run: |
-        CONFIG="$(echo '${{ steps.generate.outputs.config }}' | sed \
-            -e 's/vars.RUNNER_ARM64/${{ inputs.arm64 }}/g' \
-            -e 's/vars.RUNNER_AMD64/${{ inputs.amd64 }}/g')"
+        CONFIG="$(echo "$CONFIG_JSON" | sed \
+            -e "s/vars.RUNNER_ARM64/$ARM64_RUNNER/g" \
+            -e "s/vars.RUNNER_AMD64/$AMD64_RUNNER/g")"
         echo "config=$CONFIG" >> $GITHUB_OUTPUT

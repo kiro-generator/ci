@@ -27,13 +27,9 @@ jobs:
       - name: Print Output
         id: output
         shell: bash
+        env:
+          CONFIG_JSON: ${{ steps.test-action.outputs.config }}
         run: |
-          #echo '${{ steps.test-action.outputs.config }}' | jq .
+          echo "$CONFIG_JSON" | jq .
           packages="${{ fromJSON(steps.test-action.outputs.config).ai.enabled }}"
           echo $packages
-          # pages="${{ fromJSON(steps.test-action.outputs.config).pages.mdbook.if }}"
-
-          # if [ "$pages" != "false" ]; then
-          #   echo "pages should be false"
-          #   exit 1
-          # fi
