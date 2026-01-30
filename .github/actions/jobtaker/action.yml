@@ -7,13 +7,12 @@ inputs:
   anthropic_api_key:
     description: 'Anthropic API key'
     required: true
-
 runs:
   using: 'composite'
   steps:
     - name: jobtaker
       if: ${{ fromJSON(inputs.config).ai.enabled }}
-      uses: anthropics/claude-code-action@v1
+      uses: anthropics/claude-code-action@main
       with:
         anthropic_api_key: ${{ inputs.anthropic_api_key }}
         trigger_phrase: '@jobtaker'
