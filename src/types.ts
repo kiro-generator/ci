@@ -5,6 +5,17 @@ export enum Arch {
   MAC = 'vars.RUNNER_MAC',
 }
 
+export interface PageJob {
+  if: boolean | string;
+  path: string;
+  version: string;
+  command: string;
+}
+
+export interface PageJobs {
+  mdbook: PageJob;
+}
+
 export interface AiJob {
   enabled: boolean;
   allowed_bots: string;

@@ -1,9 +1,0 @@
-global:
-  packages:
-    Linux: 'curl'
-  rustlog: debug
-  fireblocks:
-    enabled: true
-jobs:
-  coverage:
-    if: false

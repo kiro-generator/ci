@@ -8,10 +8,11 @@ import {
   DEFAULT_EXTRA,
   DEFAULT_FMT,
   DEFAULT_HACK,
+  DEFAULT_PAGES,
   DEFAULT_SANITIZERS,
   DEFAULT_SEMVER,
 } from './defaults';
-import { type AiJob, Arch, type Clippy, type Global, type Release, type RustJobs } from './types';
+import { type AiJob, Arch, type Clippy, type Global, type PageJobs, type Release, type RustJobs } from './types';
 
 export * from './types';
 
@@ -33,6 +34,7 @@ export class RustWorkflow {
   private global: Global;
   private release: Release;
   private ai: AiJob;
+  private pages: PageJobs;
 
   constructor() {
     this.jobs = {
@@ -57,6 +59,7 @@ export class RustWorkflow {
       os: [Arch.AMD64],
     };
     this.ai = DEFAULT_AI;
+    this.pages = DEFAULT_PAGES;
   }
 
   linuxPackages(packages: string[]) {
@@ -78,6 +81,11 @@ export class RustWorkflow {
 
   withRelease(r: Release) {
     this.release = r;
+    return this;
+  }
+
+  enableMdBook() {
+    this.pages.mdbook.if = true;
     return this;
   }
 
@@ -116,6 +124,7 @@ export class RustWorkflow {
     // #      os: windows-latest
     return {
       ai: this.ai,
+      pages: this.pages,
       release: {
         bin: this.release.bin,
         publish: this.release.publish,

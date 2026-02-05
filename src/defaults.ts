@@ -9,9 +9,19 @@ import {
   type Extra,
   type Fmt,
   type Hack,
+  type PageJobs,
   type Sanitizers,
   type SemVer,
 } from './types';
+
+export const DEFAULT_PAGES: PageJobs = {
+  mdbook: {
+    if: false,
+    path: 'docs',
+    version: 'latest',
+    command: 'mdbook build',
+  },
+};
 
 export const DEFAULT_AI: AiJob = {
   enabled: true,
