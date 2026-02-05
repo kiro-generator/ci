@@ -1,7 +1,7 @@
 {
   "name": "@dougefresh/ci",
   "description": "CI Mega Config github action",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "author": "",
   "type": "module",
   "homepage": "https://github.com/dougefresh/ci",
