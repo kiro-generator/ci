@@ -27,8 +27,8 @@ export const DEFAULT_AI: AiJob = {
   enabled: true,
   track_progress: true,
   allowed_bots: '*',
-  model: 'claude-opus-4.6',
-  // claude-sonnet-4-6
+  model: 'claude-opus-4-6',
+  // claude-sonnet-4-5-20250929
   claude_args:
     '--allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(tsc *),Bash(tsgo *),Bash(bun *),Bash(find *),Bash(diff *),Bash(jq *),Bash(git *),Bash(cargo *),Bash(gh *)"',
   use_sticky_comment: false,
