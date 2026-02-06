@@ -55,8 +55,9 @@ jobs:
           label_trigger: 'jobtaker'
           allowed_bots: ${{ fromJSON(needs.config.outputs.config).ai.allowed_bots }}
           prompt: ${{ fromJSON(needs.config.outputs.config).ai.prompt }}
+          # --model ${{ fromJSON(needs.config.outputs.config).ai.model }}
           claude_args: |
-            --model ${{ fromJSON(needs.config.outputs.config).ai.model }} ${{ fromJSON(needs.config.outputs.config).ai.claude_args }}
+            ${{ fromJSON(needs.config.outputs.config).ai.claude_args }}
           use_sticky_comment: ${{ fromJSON(needs.config.outputs.config).ai.use_sticky_comment }}
           track_progress: "${{ fromJSON(needs.config.outputs.config).ai.track_progress }}"
           path_to_claude_code_executable: ''
