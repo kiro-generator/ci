@@ -46,6 +46,18 @@ jobs:
         uses: dougefresh/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
+      - uses: ubicloud/cache@v4
+        with:
+          path: ./codecov
+          key: codecov-${{ vars.RUNNER }}
+      - name: codecov cli
+        shell: bash
+        run: |
+          if [ ! -f ./codecov ]; fi
+            curl -v -L -O https://cli.codecov.io/latest/linux-arm64/codecov
+          fi
+          chmod +x ./codecov
+          sudo cp -v  ./codecov /usr/local/bin
       - name: jobtaker
         if: ${{ fromJSON(needs.config.outputs.config).ai.enabled }}
         uses: anthropics/claude-code-action@main
