@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: config
         id: config
-        uses: dougefresh/ci/.github/actions/rust-config@main
+        uses: kiro-generator/ci/.github/actions/rust-config@main
         with:
           arm64: ${{ vars.RUNNER_ARM64 }}
           amd64: ${{ vars.RUNNER_AMD64 }}
@@ -37,7 +37,7 @@ jobs:
       contents: write
     steps:
       - name: Init
-        uses: dougefresh/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo-release
@@ -93,7 +93,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Init / ${{ matrix.target }}
-        uses: dougefresh/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
           ref: ${{ needs.release.outputs.tag }}

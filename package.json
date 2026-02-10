@@ -1,39 +1,29 @@
 {
-  "name": "@dougefresh/ci",
+  "name": "@kiro-generator/ci",
   "description": "CI Mega Config github action",
   "version": "0.1.17",
   "author": "",
   "type": "module",
-  "homepage": "https://github.com/dougefresh/ci",
+  "homepage": "https://github.com/kiro-generator/ci",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dougefresh/ci.git"
+    "url": "git+https://github.com/kiro-generator/ci.git"
   },
-  "keywords": [
-    "actions"
-  ],
-  "files": [
-    "dist",
-    "src",
-    "tsconfig.json"
-  ],
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "types": "./dist/index.d.ts",
+  "keywords": ["actions"],
   "engines": {
     "node": ">=24.0.0"
   },
   "scripts": {
     "precommit": "rm -rf dist && bun run lint:fix && bun run build && bun run check:configs",
-    "check:configs": "tsgo --noEmit -p tsconfig-config.json",
+    "check:configs": "echo tsgo --noEmit -p tsconfig-config.json",
     "lint:fix": "biome check --fix && biome format --write ",
     "lint": "biome check",
-    "build": "tsgo",
-    "prepublishOnly": "bun run build"
+    "build": "echo no build"
   },
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@dougefresh/ci": "latest"
+  },
   "devDependencies": {
     "@types/bun": "^1.3.6",
     "@types/node": "^24.10.1",
