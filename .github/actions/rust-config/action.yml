@@ -5,10 +5,10 @@ inputs:
     description: 'Token to authenticate for git'
     required: false
   arm64:
-    default: "ubicloud-standard-8-arm"
+    default: "depot-ubuntu-24.04-arm"
     required: false
   amd64:
-    default: "ubicloud-standard-4"
+    default: "depot-ubuntu-24.04"
     required: false
 outputs:
   config:
