@@ -225,6 +225,7 @@ jobs:
         run: cargo test --target ${_rust_target} -- --test-threads=1 --no-capture
         env:
           RUSTFLAGS: '-Z sanitizer=thread'
+
   extra:
     needs: [config]
     runs-on: ${{ matrix.os }}
@@ -238,6 +239,17 @@ jobs:
         uses: kiro-generator/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
+      - name: Install cargo tools
+        if: ${{ fromJSON(needs.config.outputs.config).jobs.extra.cache.cargoTools }}
+        uses: taiki-e/install-action@v2
+        with:
+          tool: ${{ join(fromJSON(needs.config.outputs.config).jobs.extra.cache.cargoTools, ',') }}
+      - name: Cache paths
+        if: ${{ fromJSON(needs.config.outputs.config).jobs.extra.cache.paths }}
+        uses: actions/cache@v6
+        with:
+          path: ${{ join(fromJSON(needs.config.outputs.config).jobs.extra.cache.paths, '\n') }}
+          key: ${{ runner.os }}-extra-${{ hashFiles('**/Cargo.lock') }}
       - name: ${{ fromJSON(needs.config.outputs.config).jobs.extra.name }} / ${{ matrix.os }}
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.extra.run }}
