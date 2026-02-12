@@ -46,7 +46,7 @@ jobs:
         uses: kiro-generator/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
-      - uses: action/cache@v6
+      - uses: action/cache@v5
         with:
           path: ./codecov
           key: codecov-${{ vars.RUNNER }}
