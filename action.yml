@@ -8,9 +8,6 @@ outputs:
   config:
     description: JSON string of the config
     value: ${{ steps.generate.outputs.config }}
-  agent_settings:
-    description: agent settings.json file location
-    value: ${{ steps.generate.outputs.agent_settings }}
 runs:
   using: composite
   steps:
@@ -34,16 +31,6 @@ runs:
         if [ -f .github/agents/additional-prompt.md ]; then
           cat .github/agents/additional-prompt.md >> ${{ github.action_path }}/claude-prompt.md
         fi
-    - name: settings
-      id: settings
-      shell: bash
-      run: |
-        if [ -f .github/agents/claude-settings.json ]; then
-          SETTINGS=$(cat .github/agents/claude-settings.json | jq -c .)
-        else
-          SETTINGS=$(cat ${{ github.action_path }}/.github/agents/claude-settings.json | jq -c .)
-        fi
-        echo "agent_settings=$SETTINGS" >> $GITHUB_OUTPUT
     - id: generate
       name: generate
       shell: bash

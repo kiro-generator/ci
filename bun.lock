@@ -15,7 +15,7 @@
     },
   },
   "packages": {
-    "@dougefresh/ci": ["@dougefresh/ci@0.1.21", "", {}, "sha512-+tqo3+urgmd/Avk2ShCgnxHShN55aVYdXu3wijCaN9+7INeHnhh//oNzUVRtCM/owT/5cNKXYwitbDjfqxZ9mw=="],
+    "@dougefresh/ci": ["@dougefresh/ci@0.1.22", "", {}, "sha512-QcfXnenmjfUw9Xdtipu7Sn2aPQWBkAiYXCJcy8pdIamv6qbIW4AgCpdmgGPwG84wg0ZgcAne8ZeBbwXeO1ZSvQ=="],
 
     "@types/bun": ["@types/bun@1.3.9", "", { "dependencies": { "bun-types": "1.3.9" } }, "sha512-KQ571yULOdWJiMH+RIWIOZ7B2RXQGpL1YQrBtLIV3FqDcCu6FsbFUBwhdKUlCKUpS3PJDsHlJ1QKlpxoVR+xtw=="],
 

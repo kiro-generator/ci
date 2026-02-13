@@ -144,7 +144,7 @@ jobs:
           locked: false
       - name: cargo docs-rs
         run: |
-          ${{ fromJSON(needs.config.outputs.config).jobs.dockCheck.run }}
+          ${{ fromJSON(needs.config.outputs.config).jobs.docCheck.run }}
   cargo-sort:
     needs: [config]
     runs-on: ${{ vars.RUNNER }}
