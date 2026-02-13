@@ -50,15 +50,6 @@ jobs:
         with:
           path: ./codecov
           key: codecov-${{ vars.RUNNER }}
-      - name: settings
-        id: settings
-        shell: bash
-        run: |
-          if [ -f .github/agents/claude-settings.json ]; then
-            echo "settings=.github/agents/claude-settings.json" >> $GITHUB_OUTPUT
-          else
-            echo "settings=${{ github.action_path }}/.github/agents/claude-settings.json" >> $GITHUB_OUTPUT
-          fi
       - name: codecov cli
         shell: bash
         run: |
@@ -73,7 +64,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: '@jobtaker'
-          settings: ${{ steps.settings.outputs.settings }}
+          settings: ${{ needs.config.outputs.agent_settings }}
           label_trigger: 'jobtaker'
           allowed_bots: ${{ fromJSON(needs.config.outputs.config).ai.allowed_bots }}
           prompt: ${{ fromJSON(needs.config.outputs.config).ai.prompt }}
