@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__github_inline_comment__create_inline_comment",
+      "Bash(unzip *)",
+      "Bash(gunzip *)",
+      "Bash(tar *)",
+      "Bash(cargo *)",
+      "Bash(codecov *)",
+      "Bash(tsc *)",
+      "Bash(tsgo *)",
+      "Bash(bun *)",
+      "Bash(find *)",
+      "Bash(diff *)",
+      "Bash(jq *)",
+      "Bash(git *)",
+      "Bash(gh *)"
+    ]
+  }
+}

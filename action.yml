@@ -28,8 +28,8 @@ runs:
       run: |
         sed -e 's|%REPO%|${{ github.repository }}|g' -e 's|%PR%|${{ github.event.pull_request.number }}|g' \
           ${{ github.action_path }}/prompt-template.md >  ${{ github.action_path }}/claude-prompt.md
-        if [ -f .github/additional-prompt.md ]; then
-          cat .github/additional-prompt.md >> ${{ github.action_path }}/claude-prompt.md
+        if [ -f .github/agents/additional-prompt.md ]; then
+          cat .github/agents/additional-prompt.md >> ${{ github.action_path }}/claude-prompt.md
         fi
     - id: generate
       name: generate
