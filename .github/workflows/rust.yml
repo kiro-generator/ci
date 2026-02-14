@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [config]
     if: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.if }}
-    name: coverage / ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchains }}
+    name: ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchains }} / coverage
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.coverage.matrix)) }}
@@ -75,7 +75,7 @@ jobs:
     needs: [config]
     runs-on: ${{ matrix.os }}
     if: ${{ fromJSON(needs.config.outputs.config).jobs.clippy.if }}
-    name: clippy / ${{ matrix.features }} / ${{ matrix.os }}
+    name: ${{ matrix.features }} / ${{ matrix.os }} / clippy
     permissions:
       contents: read
       checks: write
@@ -88,12 +88,10 @@ jobs:
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: clippy / ${{ matrix.features }}
-        uses: giraffate/clippy-action@v1
-        with:
-          reporter: 'github-pr-check'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tool_name: clippy-${{ matrix.toolchains }}-${{ matrix.features }}
-          clippy_flags: ${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
+        shell: bash
+        run: |
+          FLAGS="${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}"
+          cargo clippy --all-targets $FLAGS -- -D warnings
   semver:
     needs: [config]
     runs-on: ${{ vars.RUNNER_AMD64 }}

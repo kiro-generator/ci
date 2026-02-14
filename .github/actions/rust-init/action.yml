@@ -5,7 +5,7 @@ inputs:
     description: 'Token to authenticate for git'
     required: false
   packages:
-    description: 'Packages to install per OS, see .github/ci-configs/rust-default.yml'
+    description: 'Packages to install per OS'
     required: false
     default: ''
   ref:
@@ -24,27 +24,30 @@ runs:
       uses: Swatinem/rust-cache@v2
       with:
         cache-on-failure: 'true'
-    - uses: actions-rust-lang/setup-rust-toolchain@v1
-      with:
-        toolchain: stable,nightly
-        components: rustfmt,clippy
-    # - name: Install nightyly
-    #   id: toolchain-nightly
-    #   uses: dtolnay/rust-toolchain@nightly
-    #   with:
-    #     components: "rustfmt,clippy"
-    # - name: Install stable
-    #   id: toolchain-stable
-    #   shell: bash
-    #   run: |
-    #     rustup toolchain install stable --component clippy --profile minimal --no-self-update
-    #     rustup default stable
-    #     echo "name=stable" >> $GITHUB_OUTPUT
-    - name: Debug versions
+    - name: rustup
+      id: rustup
       shell: bash
       run: |
+        if ! command -v rustup &> /dev/null ; then
+          echo "downloading rustup"
+          curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL "https://sh.rustup.rs" | sh -s -- --default-toolchain stable -y
+          # Resolve the correct CARGO_HOME path depending on OS
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "${CARGO_HOME:-$USERPROFILE/.cargo}/bin" | sed 's|/|\\|g' >> $GITHUB_PATH
+          else
+            echo "${CARGO_HOME:-$HOME/.cargo}/bin" >> $GITHUB_PATH
+          fi
+        fi
+        rustup toolchain list
+        if ! rustup toolchain list | grep -q '^nightly-'; then
+          rustup toolchain install nightly --component clippy,rustfmt --profile minimal --no-self-update
+        fi
+        echo "name=stable" >> $GITHUB_OUTPUT
+
         cargo +nightly --version
         cargo +stable --version
+      env:
+        RUNNER_OS: "${{ runner.os }}"
     - name: packages
       shell: bash
       if: ${{ inputs.packages }}
