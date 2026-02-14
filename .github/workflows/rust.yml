@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: config
         id: config
-        uses: kiro-generator/ci/.github/actions/rust-config@main
+        uses: kiro-generator/ci/.github/actions/rust-config@cache-nonsense
         with:
           arm64: ${{ vars.RUNNER_ARM64 }}
           amd64: ${{ vars.RUNNER_AMD64 }}
@@ -24,13 +24,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [config]
     if: ${{ fromJSON(needs.config.outputs.config).jobs.coverage.if }}
-    name: coverage / ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchains }}
+    name: ${{ matrix.features }} / ${{ matrix.os }} / ${{ matrix.toolchains }} / coverage
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.coverage.matrix)) }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: llvm-tools
@@ -67,7 +67,7 @@ jobs:
     if: ${{ fromJSON(needs.config.outputs.config).jobs.fmt.if }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
       - name: fmt
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.fmt.run }}
@@ -75,7 +75,7 @@ jobs:
     needs: [config]
     runs-on: ${{ matrix.os }}
     if: ${{ fromJSON(needs.config.outputs.config).jobs.clippy.if }}
-    name: clippy / ${{ matrix.features }} / ${{ matrix.os }}
+    name: ${{ matrix.features }} / ${{ matrix.os }} / clippy
     permissions:
       contents: read
       checks: write
@@ -84,16 +84,14 @@ jobs:
       matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.clippy.matrix)) }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: clippy / ${{ matrix.features }}
-        uses: giraffate/clippy-action@v1
-        with:
-          reporter: 'github-pr-check'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tool_name: clippy-${{ matrix.toolchains }}-${{ matrix.features }}
-          clippy_flags: ${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}
+        shell: bash
+        run: |
+          FLAGS="${{ matrix.features != 'default' && format('--features {0}', matrix.features) || '' }}"
+          cargo clippy --all-targets $FLAGS -- -D warnings
   semver:
     needs: [config]
     runs-on: ${{ vars.RUNNER_AMD64 }}
@@ -101,7 +99,7 @@ jobs:
     if: ${{ fromJSON(needs.config.outputs.config).jobs.semver.if }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: cargo-semver-checks
@@ -115,7 +113,7 @@ jobs:
     if: ${{ fromJSON(needs.config.outputs.config).jobs.hack.if }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo-hack
@@ -134,7 +132,7 @@ jobs:
     if: ${{ fromJSON(needs.config.outputs.config).jobs.docCheck.if }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo-docs-rs
@@ -152,7 +150,7 @@ jobs:
     if: ${{ fromJSON(needs.config.outputs.config).jobs.cargoSort.if }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
       - name: Install cargo-sort
         uses: baptiste0928/cargo-install@v3
         with:
@@ -168,7 +166,7 @@ jobs:
     if: ${{ fromJSON(needs.config.outputs.config).jobs.dependencies.if }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
       - name: Install cargo-machete
         uses: baptiste0928/cargo-install@v3
         with:
@@ -184,7 +182,7 @@ jobs:
     needs: [config, coverage]
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Enable debug symbols
@@ -236,7 +234,7 @@ jobs:
       matrix: ${{ fromJSON(toJSON(fromJSON(needs.config.outputs.config).jobs.extra.matrix)) }}
     steps:
       - name: Init
-        uses: kiro-generator/ci/.github/actions/rust-init@main
+        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo tools
