@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: merge
         id: merge
-        uses: kiro-generator/ci/.github/actions/rust-config@cache-nonsense
+        uses: kiro-generator/ci/.github/actions/rust-config@main
         with:
           git_token: ${{ github.token }}
   mdbook:

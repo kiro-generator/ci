@@ -27,7 +27,7 @@ jobs:
           fi
       - name: config
         id: config
-        uses: kiro-generator/ci/.github/actions/rust-config@cache-nonsense
+        uses: kiro-generator/ci/.github/actions/rust-config@main
         with:
           arm64: ${{ vars.RUNNER_ARM64 }}
           amd64: ${{ vars.RUNNER_AMD64 }}
@@ -43,7 +43,7 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - name: checkout
-        uses: kiro-generator/ci/.github/actions/rust-init@cache-nonsense
+        uses: kiro-generator/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - uses: actions/cache@v5

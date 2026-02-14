@@ -23,7 +23,7 @@ runs:
         token: ${{ inputs.git_token || github.token }}
     - name: generate
       id: generate
-      uses: kiro-generator/ci@cache-nonsense
+      uses: kiro-generator/ci@main
     - name: replace runners
       id: config
       shell: bash
