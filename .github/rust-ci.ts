@@ -6,7 +6,7 @@ export default function () {
   }
   return createRustWorkflow()
     .enableMdBook()
-    .extra('test-extra', 'echo hello')
+    .extraJob('test-extra', { run: 'echo hello' })
     .disableCoverage()
     .semver(false)
     .disableSanitizers()
