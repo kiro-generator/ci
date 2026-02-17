@@ -41,7 +41,7 @@ jobs:
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo-release
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/cache-cargo-install-action@v3
         with:
           tool: cargo-release
       - name: Configure Git
@@ -142,18 +142,18 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/${{ fromJSON(needs.config.outputs.config).release.homebrew.repo }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Calculate source tarball SHA256
         id: sha
         run: |
           SHA=$(curl -sL https://github.com/${{ github.repository }}/archive/refs/tags/${{ needs.release.outputs.tag }}.tar.gz | shasum -a 256 | cut -d' ' -f1)
           echo "sha256=$SHA" >> $GITHUB_OUTPUT
-          
+
       - name: Update formula
         run: |
           sed -i 's|url ".*"|url "https://github.com/${{ github.repository }}/archive/refs/tags/${{ needs.release.outputs.tag }}.tar.gz"|' Formula/${{ inputs.package }}.rb
           sed -i 's|sha256 ".*"|sha256 "${{ steps.sha.outputs.sha256 }}"|' Formula/${{ inputs.package }}.rb
-          
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"

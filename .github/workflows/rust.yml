@@ -123,10 +123,9 @@ jobs:
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo-hack
-        uses: baptiste0928/cargo-install@v3
+        uses: taiki-e/cache-cargo-install-action@v3
         with:
-          crate: cargo-hack
-          locked: false
+          tool: cargo-hack
       # intentionally no target specifier; see https://github.com/jonhoo/rust-ci-conf/pull/4
       # --feature-powerset runs for every combination of features
       - name: cargo hack
@@ -142,10 +141,9 @@ jobs:
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo-docs-rs
-        uses: baptiste0928/cargo-install@v3
+        uses: taiki-e/cache-cargo-install-action@v3
         with:
-          crate: cargo-docs-rs
-          locked: false
+          tool: cargo-docs-rs
       - name: cargo docs-rs
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.docCheck.run }}
@@ -158,10 +156,9 @@ jobs:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
       - name: Install cargo-sort
-        uses: baptiste0928/cargo-install@v3
+        uses: taiki-e/cache-cargo-install-action@v3
         with:
-          crate: cargo-sort
-          locked: false
+          tool: cargo-sort
       - name: Check `Cargo.toml` sort
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.cargoSort.run }}
@@ -174,10 +171,9 @@ jobs:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
       - name: Install cargo-machete
-        uses: baptiste0928/cargo-install@v3
+        uses: taiki-e/cache-cargo-install-action@v3
         with:
-          crate: cargo-machete
-          locked: false
+          tool: cargo-machete
       - name: Check unused Cargo dependencies
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.dependencies.run }}
@@ -245,7 +241,7 @@ jobs:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
       - name: Install cargo tools
         if: ${{ fromJSON(needs.config.outputs.config).jobs.extra.cache.cargoTools }}
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/cache-cargo-install-action@v3
         with:
           tool: ${{ join(fromJSON(needs.config.outputs.config).jobs.extra.cache.cargoTools, ',') }}
       - name: Cache paths
