@@ -2,7 +2,7 @@ import { createRustWorkflow } from '@dougefresh/ci';
 
 export default function () {
   if (process.env.CONTEXT) {
-    console.log(`context: ${process.env.CONTEXT}`);
+    console.error(`context: ${process.env.CONTEXT}`);
   }
   return createRustWorkflow()
     .enableMdBook()
