@@ -24,6 +24,11 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
+        env:
+          CONTEXT: |
+            {
+              "test": true
+            }
       - name: Print Output
         id: output
         shell: bash
