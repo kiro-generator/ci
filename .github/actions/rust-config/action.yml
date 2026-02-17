@@ -47,7 +47,7 @@ runs:
       run: |
         CONFIG="$(echo "$CONFIG_JSON" | sed \
             -e "s/vars.RUNNER_ARM64/$ARM64_RUNNER/g" \
-            -e "s/vars.RUNNER_ARM64/$ARM64_RUNNER/g" \
+            -e "s/vars.RUNNER_AMD64/$AMD64_RUNNER/g" \
             -e "s/vars.RUNNER_WIN/$WIN_RUNNER/g" \
             -e "s/vars.RUNNER_MAC/$MAC_RUNNER/g")"
         echo "config=$CONFIG" >> $GITHUB_OUTPUT
