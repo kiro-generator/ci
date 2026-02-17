@@ -12,6 +12,10 @@ inputs:
     description: 'Ref to checkout'
     required: false
     default: ''
+  nightly:
+    description: include nightly
+    required: false
+    default: ""
 runs:
   using: composite
   steps:
@@ -39,12 +43,13 @@ runs:
           fi
         fi
         rustup toolchain list
-        if ! rustup toolchain list | grep -q '^nightly-'; then
-          rustup toolchain install nightly --component clippy,rustfmt --profile minimal --no-self-update
+        if [ "${{ inputs.nightly }}" == "true" ] ; then
+           if ! rustup toolchain list | grep -q '^nightly-'; then
+             rustup toolchain install nightly --component clippy,rustfmt --profile minimal --no-self-update
+           fi
+           cargo +nightly --version
         fi
         echo "name=stable" >> $GITHUB_OUTPUT
-
-        cargo +nightly --version
         cargo +stable --version
       env:
         RUNNER_OS: "${{ runner.os }}"

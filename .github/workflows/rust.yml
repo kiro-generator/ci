@@ -74,6 +74,8 @@ jobs:
     steps:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
+        with:
+          nightly: "true"
       - name: fmt
         run: |
           ${{ fromJSON(needs.config.outputs.config).jobs.fmt.run }}
@@ -140,6 +142,7 @@ jobs:
         uses: kiro-generator/ci/.github/actions/rust-init@main
         with:
           packages: ${{ toJSON(fromJSON(needs.config.outputs.config).global.packages) }}
+          nightly: "true"
       - name: Install cargo-docs-rs
         uses: taiki-e/cache-cargo-install-action@v3
         with:
