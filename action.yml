@@ -20,6 +20,11 @@ runs:
     - name: setup bun
       if: steps.cache.outputs.cache-hit == 'false'
       uses: oven-sh/setup-bun@v2
+    - name: set path
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        echo "/home/runner/.bun/bin" >> $GITHUB_PATH
     - name: install
       shell: bash
       run: |

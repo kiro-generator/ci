@@ -19,6 +19,11 @@ runs:
         key: bun-${{ runner.os }}
     - uses: oven-sh/setup-bun@v2
       if: steps.cache.outputs.cache-hit == 'false'
+    - name: set path
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        echo "/home/runner/.bun/bin" >> $GITHUB_PATH
     - name: Package assets
       shell: bash
       env:
