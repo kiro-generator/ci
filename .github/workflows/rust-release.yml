@@ -203,9 +203,25 @@ jobs:
           name: build-debian-${{ matrix.arch }}
           path: ${{ steps.deb.outputs.deb }}
 
+  assets:
+    name: Additional Assets
+    if: ${{ fromJSON(needs.config.outputs.config).release.assets }}
+    needs: [config, release]
+    runs-on: ${{ vars.RUNNER }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+      - uses: kiro-generator/ci/.github/actions/release-assets@main
+        with:
+          assets: ${{ toJSON(fromJSON(needs.config.outputs.config).release.assets) }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: build-release-assets
+          path: target/*.tar.gz
   upload:
     name: Upload
-    needs: [release, linux-arm64, linux-amd64, mac-arm, debian]
+    needs: [release, linux-arm64, linux-amd64, mac-arm, debian, assets, windows]
     if: ${{ always() && needs.release.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:

@@ -15,7 +15,7 @@ runs:
       name: cache bun
       with:
         path: /home/runner/.bun
-        key: bun-${{ vars.RUNNER }}
+        key: bun-${{ runner.os }}
     - name: setup bun
       uses: oven-sh/setup-bun@v2
     - name: install

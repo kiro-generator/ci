@@ -1,0 +1,25 @@
+name: Release Assets
+description: Package files into tar.gz archives for release
+inputs:
+  assets:
+    description: 'JSON array of {glob, archiveName} objects'
+    required: true
+  output-dir:
+    description: 'Directory to write archives to'
+    required: false
+    default: 'target'
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v5
+      name: cache bun
+      with:
+        path: /home/runner/.bun
+        key: bun-${{ runner.os }}
+    - uses: oven-sh/setup-bun@v2
+    - name: Package assets
+      shell: bash
+      env:
+        ASSETS: ${{ inputs.assets }}
+        OUTPUT_DIR: ${{ inputs.output-dir }}
+      run: bun ${{ github.action_path }}/index.ts
