@@ -90,10 +90,6 @@ jobs:
     if: needs.release.outputs.bin && fromJSON(needs.config.outputs.config).release.bin.linux.arm64
     needs: [config, release]
     runs-on: ${{ vars.RUNNER_ARM64 }}
-    env:
-      BIN:  ${{ needs.release.outputs.bin }}
-    permissions:
-      contents: write
     steps:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
@@ -104,26 +100,17 @@ jobs:
       - name: Package
         env:
           BIN: target/aarch64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}
-        run: |
-          tar czf ${BIN}-arm64-linux.tar.gz ${BIN}
-          sha256sum ${BIN}-arm64-linux.tar.gz > ${BIN}-arm64-linux.tar.gz.sha256
-      - name: Upload
-        uses: softprops/action-gh-release@v2
+        run: tar czf ${BIN}-arm64-linux.tar.gz ${BIN}
+      - uses: actions/upload-artifact@v6
         with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          files: |
-            target/aarch64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}-arm64-linux.tar.gz
-            target/aarch64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}-arm64-linux.tar.gz.sha256
+          name: build-linux-arm64
+          path: target/aarch64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}-arm64-linux.tar.gz
 
   linux-amd64:
     name: Linux AMD64
-    needs: [config, release]
     if: needs.release.outputs.bin && fromJSON(needs.config.outputs.config).release.bin.linux.amd64
+    needs: [config, release]
     runs-on: ${{ vars.RUNNER_AMD64 }}
-    env:
-      BIN: ${{ needs.release.outputs.bin }}
-    permissions:
-      contents: write
     steps:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
@@ -134,26 +121,17 @@ jobs:
       - name: Package
         env:
           BIN: target/x86_64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}
-        run: |
-          tar czf ${BIN}-amd64-linux.tar.gz ${BIN}
-          sha256sum ${BIN}-amd64-linux.tar.gz > ${BIN}-amd64-linux.tar.gz.sha256
-      - name: Upload
-        uses: softprops/action-gh-release@v2
+        run: tar czf ${BIN}-amd64-linux.tar.gz ${BIN}
+      - uses: actions/upload-artifact@v6
         with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          files: |
-            target/x86_64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}-amd64-linux.tar.gz
-            target/x86_64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}-amd64-linux.tar.gz.sha256
+          name: build-linux-amd64
+          path: target/x86_64-unknown-linux-gnu/release/${{ needs.release.outputs.bin }}-amd64-linux.tar.gz
 
   mac-arm:
     name: macOS ARM64
     if: needs.release.outputs.bin != '' && fromJSON(needs.config.outputs.config).release.bin.mac
     needs: [config, release]
     runs-on: macos-latest
-    permissions:
-      contents: write
-    env:
-      BIN_NAME: ${{ needs.release.output.bin }}
     steps:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
@@ -164,24 +142,17 @@ jobs:
       - name: Package
         env:
           BIN: target/aarch64-apple-darwin/release/${{ needs.release.outputs.bin }}
-        run: |
-          tar czf ${BIN}-arm64-darwin.tar.gz ${BIN}
-          shasum -a 256 ${BIN}-arm64-darwin.tar.gz > ${BIN}-arm64-darwin.tar.gz.sha256
-      - name: Upload
-        uses: softprops/action-gh-release@v2
+        run: tar czf ${BIN}-arm64-darwin.tar.gz ${BIN}
+      - uses: actions/upload-artifact@v6
         with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          files: |
-            target/aarch64-apple-darwin/release/${{ needs.release.outputs.bin }}-arm64-darwin.tar.gz
-            target/aarch64-apple-darwin/release/${{ needs.release.outputs.bin }}-arm64-darwin.tar.gz.sha256
+          name: build-mac-arm64
+          path: target/aarch64-apple-darwin/release/${{ needs.release.outputs.bin }}-arm64-darwin.tar.gz
 
   windows:
     name: Windows AMD64
     if: false
     needs: [config, release]
     runs-on: windows-latest
-    permissions:
-      contents: write
     steps:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
@@ -193,16 +164,11 @@ jobs:
         shell: bash
         env:
           BIN: target/x86_64-pc-windows-msvc/release/${{ needs.release.outputs.bin }}.exe
-        run: |
-          tar czf ${BIN}-x86_64-pc-windows-msvc.tar.gz ${BIN}
-          sha256sum ${BIN}-x86_64-pc-windows-msvc.tar.gz > ${BIN}-x86_64-pc-windows-msvc.tar.gz.sha256
-      - name: Upload
-        uses: softprops/action-gh-release@v2
+        run: tar czf ${BIN}-amd64-windows.tar.gz ${BIN}
+      - uses: actions/upload-artifact@v6
         with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          files: |
-            target/x86_64-pc-windows-msvc/release/${{ needs.release.outputs.bin }}.exe-x86_64-pc-windows-msvc.tar.gz
-            target/x86_64-pc-windows-msvc/release/${{ needs.release.outputs.bin }}.exe-x86_64-pc-windows-msvc.tar.gz.sha256
+          name: build-windows-amd64
+          path: target/x86_64-pc-windows-msvc/release/${{ needs.release.outputs.bin }}.exe-amd64-windows.tar.gz
 
   debian:
     name: Debian / ${{ matrix.arch }}
@@ -218,8 +184,6 @@ jobs:
             target: x86_64-unknown-linux-gnu
             runner: ${{ vars.RUNNER_AMD64 }}
     runs-on: ${{ matrix.runner }}
-    permissions:
-      contents: write
     steps:
       - name: Init
         uses: kiro-generator/ci/.github/actions/rust-init@main
@@ -233,14 +197,30 @@ jobs:
         id: deb
         run: |
           cargo deb --target ${{ matrix.target }}
-          DEB=$(ls target/${{ matrix.target }}/debian/*.deb)
-          echo "deb=$DEB" >> $GITHUB_OUTPUT
-          sha256sum $DEB > ${DEB}.sha256
-      - name: Upload
-        uses: softprops/action-gh-release@v2
+          echo "deb=$(ls target/${{ matrix.target }}/debian/*.deb)" >> $GITHUB_OUTPUT
+      - uses: actions/upload-artifact@v6
         with:
-          tag_name: ${{ needs.release.outputs.tag }}
-          files: |
-            ${{ steps.deb.outputs.deb }}
-            ${{ steps.deb.outputs.deb }}.sha256
+          name: build-debian-${{ matrix.arch }}
+          path: ${{ steps.deb.outputs.deb }}
 
+  upload:
+    name: Upload
+    needs: [release, linux-arm64, linux-amd64, mac-arm, debian]
+    if: ${{ always() && needs.release.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+          pattern: build-*
+          merge-multiple: true
+      - name: SHA256SUMS + Upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          cd artifacts
+          sha256sum * > SHA256SUMS
+          gh release upload $TAG * --clobber --repo ${{ github.repository }}
