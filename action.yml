@@ -25,7 +25,13 @@ runs:
       shell: bash
       run: |
         echo "/home/runner/.bun/bin" >> $GITHUB_PATH
+    - uses: actions/cache@v5
+      id: cache-modules
+      with:
+        path: ${{ github.action_path }}/node_modules
+        key: node-modules-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}
     - name: install
+      if: steps.cache-modules.outputs.cache-hit == 'false'
       shell: bash
       run: |
         cd ${{ github.action_path }}
