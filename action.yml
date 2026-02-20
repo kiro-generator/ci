@@ -61,6 +61,7 @@ runs:
         else
           cp -v .github/rust-ci.ts ${{ github.action_path }}/.github/
         fi
+        export _GIT_MSG=$(git log -1 --pretty=format:%s)
         cat ${{ github.action_path }}/.github/rust-ci.ts
         cd ${{ github.action_path }}
         CONFIG="$(bun run ./scripts/generate-rust.ts | jq . --compact-output )"
