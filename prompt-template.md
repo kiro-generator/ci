@@ -1,7 +1,6 @@
 REPO: %REPO%
 PR NUMBER: %PR%
 
-Perform a comprehensive code review with the following focus areas:
 Provide detailed feedback using inline comments for ONLY issues, no praise inline comments.
 Use top-level comments for general observations or praise
 Do not be shy, I am a big boy and can handle criticism gracefully. I welcome feedback and suggestions.
