@@ -23,7 +23,7 @@ runs:
         path: ${{ github.action_path }}/node_modules
         key: node-modules-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}
     - name: setup bun
-      if: steps.cache.outputs.cache-hit == 'false'
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: oven-sh/setup-bun@v2
     - name: set path
       if: steps.cache.outputs.cache-hit == 'true'
