@@ -39,6 +39,11 @@ jobs:
           ./mdbook build ./docs
           echo $PATH
           sudo cp mdbook /usr/local/bin
+
+      - name: Install cargo-docs-rs
+        uses: taiki-e/cache-cargo-install-action@v3
+        with:
+          tool: mdbook-llms-txt-tools
       - name: Build Book
         run: |
           cd ${{ fromJSON(needs.config.outputs.config).pages.mdbook.path }}
